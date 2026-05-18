@@ -54,9 +54,6 @@
         .message.outgoing { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); color: white; align-self: flex-end !important; border-bottom-right-radius: 5px; }
         .msg-time { font-size: 0.7rem; color: #a1a1a1; margin-top: 4px; display: block; }
 
-        .reply-preview-bar { background: #ffe5ec; padding: 8px 15px; border-top: 1px solid #ffccd5; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #ff4d6d; }
-        .close-reply-btn { cursor: pointer; font-weight: bold; color: #ff6b6b; }
-
         .input-area { display: flex; padding: 15px; border-top: 1px solid #ffe5ec; background: #fff0f3; }
         .input-area input { flex: 1; padding: 14px 20px; border: 1px solid #ffccd5; border-radius: 30px; outline: none; font-size: 0.95rem; }
         .input-area button { background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; padding: 0 25px; margin-left: 10px; border-radius: 30px; cursor: pointer; font-weight: bold; }
@@ -75,10 +72,13 @@
         .video-container { display: flex; gap: 10px; margin-top: 20px; width: 90%; max-width: 600px; justify-content: center; }
         video { width: 45%; max-height: 250px; background: #222; border-radius: 10px; transform: scaleX(-1); border: 2px solid #ff758c; }
 
+        /* 🔔 ইন-অ্যাপ নোটিফিকেশন পপআপ */
+        .notification-toast { position: fixed; top: 20px; right: 20px; background: white; border-left: 6px solid #ff4d6d; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 5px; z-index: 3000; animation: slideIn 0.3s ease-out; max-width: 320px; }
+        .notification-toast h4 { color: #ff4d6d; font-size: 0.95rem; }
+        .notification-toast p { color: #333; font-size: 0.85rem; }
+
+        @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
         @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 117, 140, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(255, 117, 140, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 117, 140, 0); } }
-        .context-menu { position: absolute; background: white; border: 1px solid #ffccd5; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 1000; display: none; list-style: none; }
-        .context-menu li { padding: 10px 20px; cursor: pointer; font-size: 0.9rem; color: #333; }
-        .context-menu li:hover { background: #ffe5ec; color: #ff4d6d; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -87,7 +87,7 @@
 <div id="authScreen" class="auth-container">
     <h2>MHSMS সাইন-ইন 🌸</h2>
     <input type="text" id="usernameInput" placeholder="ইউজারনেম (ছোট হাতের ইংরেজি)">
-    <input type="password" id="passwordInput" placeholder="পাসওয়ার্ড (নূন্যতম ৬ অক্ষর)">
+    <input type="password" id="passwordInput" placeholder="পাসওয়ার্ড (নূন্যতম ۶ অক্ষর)">
     <button id="authBtn" onclick="handleAuth()">লগইন / রেজিস্টার</button>
 </div>
 
@@ -111,10 +111,6 @@
             </div>
         </div>
         <div class="message-area" id="messageArea"></div>
-        <div id="replyPreviewBar" class="reply-preview-bar hidden">
-            <span>Replying to: <i id="replyPreviewText">...</i></span>
-            <div class="close-reply-btn" onclick="cancelReply()">✕</div>
-        </div>
         <div class="input-area">
             <input type="text" id="messageInput" placeholder="মেসেজ লিখুন..." autocomplete="off">
             <button id="sendBtn" onclick="sendMessage()">পাঠান</button>
@@ -138,10 +134,7 @@
     </div>
 </div>
 
-<ul id="contextMenu" class="context-menu">
-    <li onclick="triggerEditMessage()">✏️ এডিট করুন</li>
-    <li onclick="triggerDeleteMessage()">🗑️ ডিলিট করুন</li>
-</ul>
+<div id="notificationContainer"></div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
@@ -162,7 +155,7 @@
     let currentUser = null;
     let activeChatFriend = null;
     let unsubscribeChat = null;
-    let unsubscribeCalls = null;
+    let isInitialLoad = true;
     
     // WebRTC ভ্যারিয়েবলস
     let localStream = null;
@@ -170,7 +163,14 @@
     let peerConnection = null;
     let currentCallId = null;
 
-    // Google Free STUN Servers
+    // 🎵 অডিও রিংটোন প্লেয়ার অবজেক্টস
+    const ringtoneAudio = new Audio("https://assets.mixkit.co/active_storage/sfx/1360/1360-84.wav"); // রিসিভারের রিংটোন
+    const dialtoneAudio = new Audio("https://assets.mixkit.co/active_storage/sfx/1743/1743-84.wav"); // কলারের ডায়াল টোন
+    const notifAudio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-84.wav"); // নোটিফিকেশন সাউন্ড
+
+    ringtoneAudio.loop = true;
+    dialtoneAudio.loop = true;
+
     const rtcConfig = {
         iceServers: [
             { urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }
@@ -198,27 +198,32 @@
         document.getElementById('appScreen').classList.remove('hidden');
         loadFriends();
         listenForIncomingCalls();
-        document.addEventListener('click', () => document.getElementById('contextMenu').style.display = 'none');
+        listenForGlobalMessages();
     }
 
-    async function clearChatFromList(friendName, event) {
-        event.stopPropagation();
-        if (confirm(`আপনি কি নিশ্চিতভাবে "${friendName}" এর সমস্ত চ্যাট হিস্ট্রি ডিলিট করতে চান?`)) {
-            const chatId = [currentUser, friendName].sort().join('_');
-            try {
-                const messagesRef = db.collection("chats").doc(chatId).collection("messages");
-                const snapshot = await messagesRef.get();
-                const batch = db.batch();
-                snapshot.forEach(doc => batch.delete(doc.ref));
-                await batch.commit();
-                alert("চ্যাট হিস্ট্রি ডিলিট করা হয়েছে!");
-                if(activeChatFriend === friendName) {
-                    document.getElementById('messageArea').innerHTML = '';
-                    document.getElementById('chatActions').classList.add('hidden');
-                    document.getElementById('currentChatUser').innerText = "কোনো বন্ধু সিলেক্ট করুন";
-                }
-            } catch (e) { alert("মুছে ফেলা সম্ভব হয়নি: " + e.message); }
-        }
+    // 🔔 ইন-অ্যাপ নোটিফিকেশন পপআপ তৈরি করার ফাংশন
+    function showNotificationPopup(title, body) {
+        notifAudio.play().catch(e => {});
+        const container = document.getElementById('notificationContainer');
+        const toast = document.createElement('div');
+        toast.classList.add('notification-toast');
+        toast.innerHTML = `<h4>${title}</h4><p>${body}</p>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 4000); // ৪ সেকেন্ড পর নোটিফিকেশন চলে যাবে
+    }
+
+    // ব্যাকগ্রাউন্ড বা গ্লোবাল মেসেজ নোটিফিকেশন লিসেনার
+    function listenForGlobalMessages() {
+        db.collectionGroup("messages").orderBy("timestamp", "desc").limit(1)
+            .onSnapshot(snapshot => {
+                if (isInitialLoad) { isInitialLoad = false; return; } // প্রথমবার লোডে নোটিফিকেশন আটকানো
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.sender !== currentUser && activeChatFriend !== data.sender) {
+                        showNotificationPopup(`📩 নতুন মেসেজ এসেছে!`, `${data.sender}: ${data.text}`);
+                    }
+                });
+            });
     }
 
     function loadFriends() {
@@ -230,10 +235,7 @@
                 const li = document.createElement('li');
                 li.classList.add('friend-item');
                 if(activeChatFriend === friend) li.classList.add('active');
-                li.innerHTML = `
-                    <span style="flex:1;">🌸 ${friend}</span>
-                    <span class="list-delete-btn" onclick="clearChatFromList('${friend}', event)">🗑️</span>
-                `;
+                li.innerHTML = `<span>🌸 ${friend}</span>`;
                 li.onclick = () => { 
                     activeChatFriend = friend; 
                     document.getElementById('currentChatUser').innerText = "চ্যাট উইথ: " + friend; 
@@ -245,20 +247,28 @@
         });
     }
 
-    // 📞 WebRTC + Firebase লাইভ কল ও কথা বলার সিস্টেম
+    // 📞 শক্তিশালী করা মেক কল ফাংশন + ডায়াল টোন
     async function makeCall(type) {
         if(!activeChatFriend) return;
         currentCallId = currentUser + "_" + Date.now();
         
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: type === 'Video' });
+            localStream = await navigator.mediaDevices.getUserMedia({ 
+                audio: true, 
+                video: type === 'Video' ? { width: 300, height: 300, facingMode: "user" } : false 
+            });
             document.getElementById('videoStreams').classList.remove('hidden');
             document.getElementById('localVideo').srcObject = localStream;
-        } catch (e) { alert("ক্যামেরা/মাইক্রোফোন পারমিশন দিন!"); return; }
+        } catch (e) { 
+            alert("ক্যামেরা/মাইক্রোফোন পারমিশন দিন বা ডিভাইস চেক করুন!"); 
+            return; 
+        }
+
+        // ডায়াল টোন বাজানো শুরু
+        dialtoneAudio.play().catch(e => console.log("Audio play blocked"));
 
         showCallOverlay(activeChatFriend, `${type} Call - Ringing...`, false);
         
-        // WebRTC Connection তৈরি
         peerConnection = new RTCPeerConnection(rtcConfig);
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
@@ -268,14 +278,12 @@
             event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
         };
 
-        // ICE Candidate জেনারেট করা
         const callDoc = db.collection("calls").doc(currentCallId);
         const callerCandidatesCollection = callDoc.collection("callerCandidates");
         peerConnection.onicecandidate = event => {
             if(event.candidate) callerCandidatesCollection.add(event.candidate.toJSON());
         };
 
-        // Offer তৈরি করা (SDP)
         const offerDescription = await peerConnection.createOffer();
         await peerConnection.setLocalDescription(offerDescription);
 
@@ -287,7 +295,6 @@
             offer: { type: offerDescription.type, sdp: offerDescription.sdp }
         });
 
-        // Answer এর জন্য অপেক্ষা করা
         callDoc.onSnapshot(snapshot => {
             const data = snapshot.data();
             if (data && data.answer && !peerConnection.currentRemoteDescription) {
@@ -296,12 +303,10 @@
             }
         });
 
-        // রিসিভারের ICE Candidates অ্যাড করা
         callDoc.collection("receiverCandidates").onSnapshot(snapshot => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
-                    const candidate = new RTCIiceCandidate(change.doc.data());
-                    peerConnection.addIceCandidate(candidate);
+                    peerConnection.addIceCandidate(new RTCIiceCandidate(change.doc.data())).catch(e => {});
                 }
             });
         });
@@ -309,31 +314,48 @@
         listenToCallStatus();
     }
 
+    // ইনকামিং কল লিসেনার + মিষ্টি রিংটোন ও নোটিফিকেশন পপআপ
     function listenForIncomingCalls() {
         db.collection("calls")
             .where("receiver", "==", currentUser)
             .where("status", "==", "ringing")
             .onSnapshot(snapshot => {
                 snapshot.forEach(doc => {
-                    if (currentCallId) return; // অলরেডি কথা বলতে থাকলে ইগনোর করবে
+                    if (currentCallId) return; 
                     const data = doc.data();
                     currentCallId = doc.id;
+
+                    // রিংটোন বাজানো শুরু এবং নোটিফিকেশন দেখানো
+                    ringtoneAudio.play().catch(e => console.log("Audio play blocked"));
+                    showNotificationPopup("📞 ইনকামিং কল!", `${data.caller} আপনাকে কল দিচ্ছেন...`);
+
                     showCallOverlay(data.caller, `Incoming ${data.type} Call...`, true);
                 });
             });
     }
 
+    // 📞 শক্তিশালী করা অ্যান্সার কল ফাংশন (রিংটোন অফ হবে)
     async function answerCall() {
+        // রিংটোন বন্ধ করা
+        ringtoneAudio.pause();
+        ringtoneAudio.currentTime = 0;
+
         const callDoc = db.collection("calls").doc(currentCallId);
         const docSnapshot = await callDoc.get();
         if(!docSnapshot.exists) return;
         const data = docSnapshot.data();
 
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: data.type === 'Video' });
+            localStream = await navigator.mediaDevices.getUserMedia({ 
+                audio: true, 
+                video: data.type === 'Video' ? { width: 300, height: 300, facingMode: "user" } : false 
+            });
             document.getElementById('videoStreams').classList.remove('hidden');
             document.getElementById('localVideo').srcObject = localStream;
-        } catch (e) { alert("ক্যামেরা/মাইক্রোফোন চালু করা যায়নি!"); return; }
+        } catch (e) { 
+            alert("ক্যামেরা বা মাইক্রোফোন ওপেন করা যায়নি!"); 
+            return; 
+        }
 
         document.getElementById('callTypeStatus').innerText = "Connecting...";
         document.getElementById('btnAcceptCall').classList.add('hidden');
@@ -347,17 +369,14 @@
             event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
         };
 
-        // রিসিভারের ICE Candidate পাঠানো
         const receiverCandidatesCollection = callDoc.collection("receiverCandidates");
         peerConnection.onicecandidate = event => {
             if(event.candidate) receiverCandidatesCollection.add(event.candidate.toJSON());
         };
 
-        // কল অফার সেট করা
         const offerDescription = data.offer;
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offerDescription));
 
-        // অ্যান্সার তৈরি করা
         const answerDescription = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answerDescription);
 
@@ -366,11 +385,10 @@
             answer: { type: answerDescription.type, sdp: answerDescription.sdp }
         });
 
-        // কলারের ICE Candidates রিড করা
         callDoc.collection("callerCandidates").onSnapshot(snapshot => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
-                    peerConnection.addIceCandidate(new RTCIiceCandidate(change.doc.data()));
+                    peerConnection.addIceCandidate(new RTCIiceCandidate(change.doc.data())).catch(e => {});
                 }
             });
         });
@@ -383,6 +401,9 @@
             if(!doc.exists) { cleanUpCallUI(); return; }
             const data = doc.data();
             if(data.status === "accepted") {
+                // কল রিসিভ হলে ডায়ালটোন বা রিংটোন বন্ধ হবে
+                dialtoneAudio.pause(); dialtoneAudio.currentTime = 0;
+                ringtoneAudio.pause(); ringtoneAudio.currentTime = 0;
                 document.getElementById('callTypeStatus').innerText = "Call Connected & Speaking... 🎙️";
             } else if(data.status === "ended") {
                 cleanUpCallUI();
@@ -409,6 +430,10 @@
     }
 
     function cleanUpCallUI() {
+        // সমস্ত রিংটোন এবং সাউন্ড বন্ধ করা
+        dialtoneAudio.pause(); dialtoneAudio.currentTime = 0;
+        ringtoneAudio.pause(); ringtoneAudio.currentTime = 0;
+
         document.getElementById('callOverlay').classList.add('hidden');
         document.getElementById('btnAcceptCall').classList.add('hidden');
         document.getElementById('videoStreams').classList.add('hidden');
@@ -419,7 +444,7 @@
         currentCallId = null;
     }
 
-    // মেসেজিং স্ক্রিপ্ট (অপরিবর্তিত)
+    // মেসেজিং লজিক
     function loadMessages() {
         if (unsubscribeChat) unsubscribeChat();
         const chatId = [currentUser, activeChatFriend].sort().join('_');
@@ -427,7 +452,7 @@
             .onSnapshot(snapshot => {
                 const area = document.getElementById('messageArea'); area.innerHTML = '';
                 snapshot.forEach(doc => {
-                    const data = doc.data(); const msgId = doc.id;
+                    const data = doc.data();
                     const wrapper = document.createElement('div'); wrapper.classList.add('message-wrapper');
                     const container = document.createElement('div'); container.classList.add('message-container');
                     const msgDiv = document.createElement('div'); msgDiv.classList.add('message', data.sender === currentUser ? 'outgoing' : 'incoming');
