@@ -213,7 +213,6 @@
         }
     };
 
-    // ⚡ অটো-কম্প্রেস এবং ইমেজ প্রসেসিং ফাংশন (যেকোনো সাইজের ছবির জন্য)
     function previewAndConvertImage(input) {
         const file = input.files[0];
         if (file) {
@@ -222,11 +221,10 @@
             reader.onload = function (e) {
                 const img = new Image();
                 img.onload = function() {
-                    // ছবির অনুপাত ঠিক রেখে রিসাইজ করা হচ্ছে
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const max_size = 300; // প্রোফাইল পিকচারের জন্য স্ট্যান্ডার্ড সাইজ
+                    const max_size = 300;
 
                     if (width > height) {
                         if (width > max_size) {
@@ -245,7 +243,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // ছবির কোয়ালিটি ০.৭ (৭০%) দিয়ে কম্প্রেস করা হচ্ছে যাতে ডাটাবেজে সুন্দরভাবে সেভ হয়
                     globalBase64Image = canvas.toDataURL('image/jpeg', 0.7);
                     document.getElementById('uploadStatus').innerText = "ছবি সফলভাবে যুক্ত হয়েছে! ✅";
                 };
@@ -468,6 +465,7 @@
             });
     }
 
+    // ⚡ ফিক্সড রিসিভ ফাংশন
     async function answerCall() {
         ringtoneAudio.pause();
         ringtoneAudio.currentTime = 0;
@@ -475,7 +473,7 @@
         const callDoc = db.collection("calls").doc(currentCallId);
         const docSnapshot = await callDoc.get();
         if(!docSnapshot.exists) return;
-        const data = docSnapshot.get();
+        const data = docSnapshot.data(); // ডাটা রিড করার ফিক্সড লাইন
 
         try {
             localStream = await navigator.mediaDevices.getUserMedia({ 
