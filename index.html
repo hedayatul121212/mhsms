@@ -11,11 +11,15 @@
         .app-container { width: 100%; max-width: 950px; height: 85vh; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; overflow: hidden; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
         
         /* Auth Screen */
-        .auth-container { width: 100%; max-width: 400px; background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border: 2px solid #ffb7b2; }
-        .auth-container h2 { margin-bottom: 20px; color: #ff6b6b; font-size: 1.8rem; }
-        .auth-container input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ffccd5; border-radius: 25px; outline: none; transition: 0.3s; padding-left: 20px; }
+        .auth-container { width: 100%; max-width: 400px; background: white; padding: 30px 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border: 2px solid #ffb7b2; }
+        .auth-container h2 { margin-bottom: 15px; color: #ff6b6b; font-size: 1.8rem; }
+        .auth-container input { width: 100%; padding: 12px 20px; margin: 8px 0; border: 1px solid #ffccd5; border-radius: 25px; outline: none; transition: 0.3s; font-size: 0.9rem; }
         .auth-container input:focus { border-color: #ff6b6b; box-shadow: 0 0 8px rgba(255,107,107,0.2); }
         .auth-container button { width: 100%; padding: 14px; background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; box-shadow: 0 4px 10px rgba(255,107,107,0.3); }
+        .auth-note { font-size: 0.75rem; color: #888; margin-top: 5px; display: block; }
+
+        /* Avatar Global Style */
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #ff758c; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.1rem; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
         /* Sidebar */
         .sidebar { width: 30%; border-right: 1px solid #ffe5ec; display: flex; flex-direction: column; background: #fff5f7; }
@@ -30,14 +34,15 @@
         .add-friend-box button { padding: 0 15px; background: #ff4d6d; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; }
         
         .friend-list { flex: 1; overflow-y: auto; list-style: none; }
-        .friend-item { padding: 15px 12px; border-bottom: 1px solid #ffe5ec; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 500; color: #4a4a4a; }
+        .friend-item { padding: 12px; border-bottom: 1px solid #ffe5ec; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 12px; font-weight: 500; color: #4a4a4a; }
         .friend-item:hover { background: #ffe5ec; }
         .friend-item.active { background: #ffccd5; color: #ff0040; font-weight: bold; border-left: 5px solid #ff4d6d; }
+        .friend-info { flex: 1; display: flex; flex-direction: column; }
 
         /* Chat Area */
         .chat-area { width: 70%; display: flex; flex-direction: column; background: #fffbfb; position: relative; }
-        .chat-header { padding: 15px; background: #fff0f3; border-bottom: 1px solid #ffe5ec; font-weight: bold; font-size: 1rem; color: #ff4d6d; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .chat-header-left { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chat-header { padding: 12px 15px; background: #fff0f3; border-bottom: 1px solid #ffe5ec; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .chat-header-userinfo { flex: 1; display: flex; align-items: center; gap: 10px; font-weight: bold; font-size: 1rem; color: #ff4d6d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .chat-actions-container { display: flex; align-items: center; gap: 15px; }
         .call-btn { background: none; border: none; font-size: 1.3rem; cursor: pointer; transition: 0.2s; padding: 4px 8px; border-radius: 5px; }
         .call-btn:hover { background: rgba(255, 117, 140, 0.15); transform: scale(1.1); }
@@ -46,7 +51,7 @@
 
         .message-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png'); }
         .message-wrapper { display: flex; flex-direction: column; width: 100%; position: relative; margin-bottom: 5px; }
-        .message-container { display: flex; align-items: center; width: 100%; position: relative; transition: transform 0.2s ease; cursor: grab; user-select: none; }
+        .message-container { display: flex; align-items: center; width: 100%; position: relative; transition: transform 0.2s ease; user-select: none; }
         .message { padding: 12px 16px; border-radius: 20px; max-width: 65%; word-wrap: break-word; font-size: 0.95rem; position: relative; }
         .message.incoming { background: #f1f3f5; align-self: flex-start !important; border-bottom-left-radius: 5px; color: #333; }
         .message.outgoing { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); color: white; align-self: flex-end !important; border-bottom-right-radius: 5px; }
@@ -56,9 +61,9 @@
         .input-area input { flex: 1; padding: 14px 20px; border: 1px solid #ffccd5; border-radius: 30px; outline: none; font-size: 0.95rem; }
         .input-area button { background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; padding: 0 25px; margin-left: 10px; border-radius: 30px; cursor: pointer; font-weight: bold; }
         
-        /* 📞 রিয়েল-টাইম কলিং স্ক্রিন ওভারলে */
+        /* 📞 ਰিয়েল-টাইਮ কলিং স্ক্রিন ওভারলে */
         .call-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; color: white; text-align: center; padding: 20px; }
-        .call-avatar { width: 100px; height: 100px; background: #ff758c; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-bottom: 15px; box-shadow: 0 0 25px #ff758c; animation: pulse 1.5s infinite; }
+        .call-avatar-large { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background: #ff758c; color: white; display: flex; justify-content: center; align-items: center; font-size: 3rem; font-weight: bold; margin-bottom: 15px; box-shadow: 0 0 25px #ff758c; animation: pulse 1.5s infinite; border: 3px solid white; }
         .call-status { font-size: 1.1rem; color: #ffccd5; margin-bottom: 25px; font-weight: bold; }
         
         .call-buttons { display: flex; gap: 20px; margin-bottom: 15px; z-index: 10; }
@@ -66,7 +71,7 @@
         .btn-accept { background: #28a745; box-shadow: 0 4px 10px rgba(40,167,69,0.4); }
         .btn-decline { background: #dc3545; box-shadow: 0 4px 10px rgba(220,53,69,0.4); }
 
-        /* ভিডিও স্ট্রিম উইন্ডো (মোবাইলে পারফেক্ট দেখানোর জন্য রেসপন্সিভ করা হলো) */
+        /* ভিডিও স্ট্রিম উইন্ডো */
         .video-container { display: flex; gap: 10px; margin-top: 15px; width: 100%; max-width: 500px; justify-content: center; flex-wrap: wrap; }
         video { width: 45%; min-width: 140px; height: 180px; background: #222; border-radius: 12px; object-fit: cover; transform: scaleX(-1); border: 2px solid #ff758c; }
 
@@ -86,6 +91,8 @@
     <h2>MHSMS সাইন-ইন 🌸</h2>
     <input type="text" id="usernameInput" placeholder="ইউজারনেম (ছোট হাতের ইংরেজি)">
     <input type="password" id="passwordInput" placeholder="পাসওয়ার্ড (নূন্যতম ৬ অক্ষর)">
+    <input type="text" id="avatarInput" placeholder="প্রোফাইল পিকচার লিংক (ঐচ্ছিক)">
+    <span class="auth-note">* নতুন অ্যাকাউন্ট খুললে পিকচার লিংক দিতে পারেন।</span>
     <button id="authBtn" onclick="handleAuth()">লগইন / রেজিস্টার</button>
 </div>
 
@@ -101,7 +108,9 @@
     
     <div class="chat-area">
         <div class="chat-header">
-            <div class="chat-header-left" id="currentChatUser">কোনো বন্ধু সিলেক্ট করুন</div>
+            <div class="chat-header-userinfo" id="currentChatUser">
+                <span>কোনো বন্ধু সিলেক্ট করুন</span>
+            </div>
             <div class="chat-actions-container hidden" id="chatActions">
                 <button class="call-btn" onclick="makeCall('Audio')">📞</button>
                 <button class="call-btn" onclick="makeCall('Video')">📹</button>
@@ -117,7 +126,7 @@
 </div>
 
 <div id="callOverlay" class="call-overlay hidden">
-    <div class="call-avatar" id="callAvatar">👤</div>
+    <div id="callAvatarContainer"></div>
     <h2 id="callUserName">User</h2>
     <div class="call-status" id="callTypeStatus">Calling...</div>
     
@@ -154,6 +163,7 @@
     let activeChatFriend = null;
     let unsubscribeChat = null;
     let isInitialLoad = true;
+    let cachedUsers = {}; // অন্যান্য বন্ধুদের প্রোফাইল পিক ক্যাশ রাখার জন্য
     
     // WebRTC ভ্যারিয়েবলস
     let localStream = null;
@@ -175,16 +185,29 @@
         ]
     };
 
+    // প্রোফাইল পিকচার জেনারেট বা শো করার হেল্পার ফাংশন
+    function createAvatarHTML(username, url, isLarge = false) {
+        const cssClass = isLarge ? 'call-avatar-large' : 'user-avatar';
+        if (url && url.trim() !== "") {
+            return `<img src="${url}" class="${cssClass}" alt="${username}">`;
+        } else {
+            const firstLetter = username.charAt(0).toUpperCase();
+            return `<div class="${cssClass}">${firstLetter}</div>`;
+        }
+    }
+
     async function handleAuth() {
         const username = document.getElementById('usernameInput').value.trim().toLowerCase();
         const password = document.getElementById('passwordInput').value.trim();
+        const avatarUrl = document.getElementById('avatarInput').value.trim();
+        
         if(!username || password.length < 6) { alert("সঠিক ইউজারনেম ও পাসওয়ার্ড দিন।"); return; }
         try {
             const userRef = db.collection("users").doc(username);
             const doc = await userRef.get();
             if (doc.exists && doc.data().password === password) { loginSuccess(username); } 
             else if (!doc.exists) {
-                await userRef.set({ username, password, friends: [] });
+                await userRef.set({ username, password, avatar: avatarUrl, friends: [] });
                 loginSuccess(username);
             } else { alert("ভুল পাসওয়ার্ড!"); }
         } catch (e) { alert("এরর: " + e.message); }
@@ -222,24 +245,49 @@
             });
     }
 
+    async function getUserAvatar(username) {
+        if (cachedUsers[username]) return cachedUsers[username];
+        try {
+            const doc = await db.collection("users").doc(username).get();
+            if (doc.exists && doc.data().avatar) {
+                cachedUsers[username] = doc.data().avatar;
+                return doc.data().avatar;
+            }
+        } catch(e) {}
+        return "";
+    }
+
     function loadFriends() {
-        db.collection("users").doc(currentUser).onSnapshot((doc) => {
+        db.collection("users").doc(currentUser).onSnapshot(async (doc) => {
             const list = document.getElementById('friendList');
             list.innerHTML = '';
             if(!doc.exists) return;
-            (doc.data().friends || []).forEach(friend => {
+            
+            const friends = doc.data().friends || [];
+            for (const friend of friends) {
+                const avatarUrl = await getUserAvatar(friend);
                 const li = document.createElement('li');
                 li.classList.add('friend-item');
                 if(activeChatFriend === friend) li.classList.add('active');
-                li.innerHTML = `<span>🌸 ${friend}</span>`;
+                
+                li.innerHTML = `
+                    ${createAvatarHTML(friend, avatarUrl)}
+                    <div class="friend-info">
+                        <span>🌸 ${friend}</span>
+                    </div>
+                `;
+                
                 li.onclick = () => { 
                     activeChatFriend = friend; 
-                    document.getElementById('currentChatUser').innerText = "চ্যাট উইথ: " + friend; 
+                    document.getElementById('currentChatUser').innerHTML = `
+                        ${createAvatarHTML(friend, avatarUrl)}
+                        <span>চ্যাট উইথ: ${friend}</span>
+                    `; 
                     document.getElementById('chatActions').classList.remove('hidden');
                     loadMessages(); 
                 };
                 list.appendChild(li);
-            });
+            }
         });
     }
 
@@ -260,7 +308,8 @@
         }
 
         dialtoneAudio.play().catch(e => {});
-        showCallOverlay(activeChatFriend, `${type} Call - Ringing...`, false);
+        const friendAvatar = await getUserAvatar(activeChatFriend);
+        showCallOverlay(activeChatFriend, friendAvatar, `${type} Call - Ringing...`, false);
         
         peerConnection = new RTCPeerConnection(rtcConfig);
         localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
@@ -311,16 +360,17 @@
         db.collection("calls")
             .where("receiver", "==", currentUser)
             .where("status", "==", "ringing")
-            .onSnapshot(snapshot => {
-                snapshot.forEach(doc => {
+            .onSnapshot(async (snapshot) => {
+                for (const doc of snapshot.docs) {
                     if (currentCallId) return; 
                     const data = doc.data();
                     currentCallId = doc.id;
 
                     ringtoneAudio.play().catch(e => {});
+                    const callerAvatar = await getUserAvatar(data.caller);
                     showNotificationPopup("📞 ইনকামিং কল!", `${data.caller} আপনাকে কল দিচ্ছেন...`);
-                    showCallOverlay(data.caller, `Incoming ${data.type} Call...`, true);
-                });
+                    showCallOverlay(data.caller, callerAvatar, `Incoming ${data.type} Call...`, true);
+                }
             });
     }
 
@@ -373,7 +423,6 @@
             answer: { type: answerDescription.type, sdp: answerDescription.sdp }
         });
 
-        // 🛠️ ফিক্স করা টাইপো লাইন (RTCIiceCandidate -> RTCIceCandidate)
         callDoc.collection("callerCandidates").onSnapshot(snapshot => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === 'added') {
@@ -409,10 +458,10 @@
         cleanUpCallUI();
     }
 
-    function showCallOverlay(name, status, isIncoming) {
+    function showCallOverlay(name, avatarUrl, status, isIncoming) {
         document.getElementById('callUserName').innerText = name;
         document.getElementById('callTypeStatus').innerText = status;
-        document.getElementById('callAvatar').innerText = name.charAt(0).toUpperCase();
+        document.getElementById('callAvatarContainer').innerHTML = createAvatarHTML(name, avatarUrl, true);
         document.getElementById('callOverlay').classList.remove('hidden');
         if(isIncoming) { document.getElementById('btnAcceptCall').classList.remove('hidden'); }
     }
@@ -462,7 +511,16 @@
         input.value = '';
     }
 
-    async function addFriend() { const f = document.getElementById('friendUsername').value.trim().toLowerCase(); if(!f || f === currentUser) return; await db.collection("users").doc(currentUser).update({ friends: firebase.firestore.FieldValue.arrayUnion(f) }); await db.collection("users").doc(f).update({ friends: firebase.firestore.FieldValue.arrayUnion(currentUser) }); alert("যুক্ত হয়েছে!"); document.getElementById('friendUsername').value = ''; }
+    async function addFriend() { 
+        const f = document.getElementById('friendUsername').value.trim().toLowerCase(); 
+        if(!f || f === currentUser) return; 
+        try {
+            await db.collection("users").doc(currentUser).update({ friends: firebase.firestore.FieldValue.arrayUnion(f) }); 
+            await db.collection("users").doc(f).update({ friends: firebase.firestore.FieldValue.arrayUnion(currentUser) }); 
+            alert("যুক্ত হয়েছে!"); 
+            document.getElementById('friendUsername').value = ''; 
+        } catch(e) { alert("ইউজারটি খুঁজে পাওয়া যায়নি!"); }
+    }
     document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key === 'Enter') sendMessage(); });
 </script>
 </body>
