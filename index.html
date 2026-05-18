@@ -13,14 +13,14 @@
         /* Auth Screen */
         .auth-container { width: 100%; max-width: 400px; background: white; padding: 30px 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border: 2px solid #ffb7b2; }
         .auth-container h2 { margin-bottom: 15px; color: #ff6b6b; font-size: 1.8rem; }
-        .auth-container input { width: 100%; padding: 12px 20px; margin: 8px 0; border: 1px solid #ffccd5; border-radius: 25px; outline: none; transition: 0.3s; font-size: 0.9rem; }
+        .auth-container input[type="text"], .auth-container input[type="password"] { width: 100%; padding: 12px 20px; margin: 8px 0; border: 1px solid #ffccd5; border-radius: 25px; outline: none; transition: 0.3s; font-size: 0.9rem; }
         .auth-container input:focus { border-color: #ff6b6b; box-shadow: 0 0 8px rgba(255,107,107,0.2); }
         
-        /* File Upload Style */
-        .file-upload-wrapper { margin: 8px 0; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .file-upload-btn { background: #fff0f3; border: 1px dashed #ff758c; padding: 10px 20px; border-radius: 25px; color: #ff4d6d; cursor: pointer; font-size: 0.9rem; font-weight: bold; width: 100%; transition: 0.3s; }
-        .file-upload-btn:hover { background: #ffe5ec; }
-        #uploadStatus { font-size: 0.8rem; color: #28a745; margin-top: 2px; font-weight: bold; }
+        /* File Upload Design */
+        .upload-section { margin: 15px 0; text-align: center; background: #fff5f7; padding: 10px; border-radius: 15px; border: 1px dashed #ff758c; }
+        .upload-section span { font-size: 0.9rem; color: #4a4a4a; display: block; margin-bottom: 5px; font-weight: bold; }
+        .upload-section input[type="file"] { width: 100%; font-size: 0.85rem; color: #555; }
+        #uploadStatus { font-size: 0.85rem; color: #28a745; font-weight: bold; margin-top: 5px; }
 
         .auth-container button.main-btn { width: 100%; padding: 14px; background: linear-gradient(45deg, #ff6b6b, #ff8e8e); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; box-shadow: 0 4px 10px rgba(255,107,107,0.3); }
         .auth-note { font-size: 0.75rem; color: #888; margin-top: 5px; display: block; }
@@ -46,7 +46,7 @@
         .friend-item.active { background: #ffccd5; color: #ff0040; font-weight: bold; border-left: 5px solid #ff4d6d; }
         .friend-info { flex: 1; display: flex; flex-direction: column; }
 
-        /* 🚪 লগআউট বাটন ডিজাইন */
+        /* Logout Button */
         .sidebar-footer { padding: 15px; background: #fff; border-top: 1px solid #ffe5ec; text-align: center; }
         .logout-btn { width: 100%; padding: 10px; background: #dc3545; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.9rem; }
         .logout-btn:hover { background: #bd2130; box-shadow: 0 3px 8px rgba(220,53,69,0.3); }
@@ -73,7 +73,7 @@
         .input-area input { flex: 1; padding: 14px 20px; border: 1px solid #ffccd5; border-radius: 30px; outline: none; font-size: 0.95rem; }
         .input-area button { background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; padding: 0 25px; margin-left: 10px; border-radius: 30px; cursor: pointer; font-weight: bold; }
         
-        /* 📞 রিয়েল-টাইম কলিং স্ক্রিন ওভারলে */
+        /* Call Overlay */
         .call-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; color: white; text-align: center; padding: 20px; }
         .call-avatar-large { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background: #ff758c; color: white; display: flex; justify-content: center; align-items: center; font-size: 3rem; font-weight: bold; margin-bottom: 15px; box-shadow: 0 0 25px #ff758c; animation: pulse 1.5s infinite; border: 3px solid white; }
         .call-status { font-size: 1.1rem; color: #ffccd5; margin-bottom: 25px; font-weight: bold; }
@@ -83,11 +83,11 @@
         .btn-accept { background: #28a745; box-shadow: 0 4px 10px rgba(40,167,69,0.4); }
         .btn-decline { background: #dc3545; box-shadow: 0 4px 10px rgba(220,53,69,0.4); }
 
-        /* ভিডিও স্ট্রিম উইন্ডো */
+        /* Video Streams */
         .video-container { display: flex; gap: 10px; margin-top: 15px; width: 100%; max-width: 500px; justify-content: center; flex-wrap: wrap; }
         video { width: 45%; min-width: 140px; height: 180px; background: #222; border-radius: 12px; object-fit: cover; transform: scaleX(-1); border: 2px solid #ff758c; }
 
-        /* 🔔 ইন-অ্যাপ নোটিফিকেশন পপআপ */
+        /* Notification Toast */
         .notification-toast { position: fixed; top: 20px; right: 20px; background: white; border-left: 6px solid #ff4d6d; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 5px; z-index: 3000; animation: slideIn 0.3s ease-out; max-width: 320px; }
         .notification-toast h4 { color: #ff4d6d; font-size: 0.95rem; }
         .notification-toast p { color: #333; font-size: 0.85rem; }
@@ -104,13 +104,13 @@
     <input type="text" id="usernameInput" placeholder="ইউজারনেম (ছোট হাতের ইংরেজি)">
     <input type="password" id="passwordInput" placeholder="পাসওয়ার্ড (নূন্যতম ৬ অক্ষর)">
     
-    <div class="file-upload-wrapper">
-        <label for="avatarFileInput" class="file-upload-btn">গ্যালারি থেকে ছবি নিন 📷</label>
-        <input type="file" id="avatarFileInput" accept="image/*" style="display: none;" onchange="previewAndConvertImage(this)">
+    <div class="upload-section">
+        <span>প্রোফাইল পিকচার আপলোড করুন 📷</span>
+        <input type="file" id="avatarFileInput" accept="image/*" onchange="previewAndConvertImage(this)">
     </div>
     <div id="uploadStatus">কোনো ছবি নেওয়া হয়নি</div>
     
-    <span class="auth-note">* নতুন অ্যাকাউন্ট খুললে ছবি আপলোড করতে পারেন।</span>
+    <span class="auth-note">* নতুন অ্যাকাউন্ট খুললে যেকোনো ছবি আপলোড করতে পারেন।</span>
     <button id="authBtn" class="main-btn" onclick="handleAuth()">লগইন / রেজিস্টার</button>
 </div>
 
@@ -206,7 +206,6 @@
         ]
     };
 
-    // 🔄 অ্যাপ ওপেন হওয়ার সাথে সাথে চেক করবে আগে লগইন করা আছে কি না
     window.onload = function() {
         const savedUser = localStorage.getItem("mhsms_username");
         if (savedUser) {
@@ -214,18 +213,43 @@
         }
     };
 
+    // ⚡ অটো-কম্প্রেস এবং ইমেজ প্রসেসিং ফাংশন (যেকোনো সাইজের ছবির জন্য)
     function previewAndConvertImage(input) {
         const file = input.files[0];
         if (file) {
-            if (file.size > 150000) { 
-                alert("ছবির সাইজ অনেক বড়! দয়া করে ছোট সাইজের ছবি দিন।");
-                input.value = "";
-                return;
-            }
+            document.getElementById('uploadStatus').innerText = "ছবি প্রসেস হচ্ছে... ⏳";
             const reader = new FileReader();
             reader.onload = function (e) {
-                globalBase64Image = e.target.result; 
-                document.getElementById('uploadStatus').innerText = "ছবি সফলভাবে যুক্ত হয়েছে! ✅";
+                const img = new Image();
+                img.onload = function() {
+                    // ছবির অনুপাত ঠিক রেখে রিসাইজ করা হচ্ছে
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const max_size = 300; // প্রোফাইল পিকচারের জন্য স্ট্যান্ডার্ড সাইজ
+
+                    if (width > height) {
+                        if (width > max_size) {
+                            height *= max_size / width;
+                            width = max_size;
+                        }
+                    } else {
+                        if (height > max_size) {
+                            width *= max_size / height;
+                            height = max_size;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // ছবির কোয়ালিটি ০.৭ (৭০%) দিয়ে কম্প্রেস করা হচ্ছে যাতে ডাটাবেজে সুন্দরভাবে সেভ হয়
+                    globalBase64Image = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('uploadStatus').innerText = "ছবি সফলভাবে যুক্ত হয়েছে! ✅";
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -250,12 +274,12 @@
             const userRef = db.collection("users").doc(username);
             const doc = await userRef.get();
             if (doc.exists && doc.data().password === password) { 
-                localStorage.setItem("mhsms_username", username); // লোকাল স্টোরেজে ইউজারনেম সেভ
+                localStorage.setItem("mhsms_username", username); 
                 loginSuccess(username); 
             } 
             else if (!doc.exists) {
                 await userRef.set({ username, password, avatar: globalBase64Image, friends: [] });
-                localStorage.setItem("mhsms_username", username); // লোকাল স্টোরেজে ইউজারনেম সেভ
+                localStorage.setItem("mhsms_username", username); 
                 loginSuccess(username);
             } else { alert("ভুল পাসওয়ার্ড!"); }
         } catch (e) { alert("এরর: " + e.message); }
@@ -266,7 +290,6 @@
         document.getElementById('authScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
         
-        // ইনপুট ফিল্ডগুলো রিসেট করা
         document.getElementById('usernameInput').value = "";
         document.getElementById('passwordInput').value = "";
         document.getElementById('avatarFileInput').value = "";
@@ -278,10 +301,9 @@
         listenForGlobalMessages();
     }
 
-    // 🚪 লগআউট ফাংশন (যা লোকাল স্টোরেজ ক্লিয়ার করবে)
     function handleLogout() {
         if(confirm("আপনি কি নিশ্চিতভাবে লগআউট করতে চান?")) {
-            localStorage.removeItem("mhsms_username"); // লোকাল স্টোরেজ ডিলিট
+            localStorage.removeItem("mhsms_username"); 
             currentUser = null;
             activeChatFriend = null;
             if (unsubscribeChat) unsubscribeChat();
@@ -453,7 +475,7 @@
         const callDoc = db.collection("calls").doc(currentCallId);
         const docSnapshot = await callDoc.get();
         if(!docSnapshot.exists) return;
-        const data = docSnapshot.data();
+        const data = docSnapshot.get();
 
         try {
             localStream = await navigator.mediaDevices.getUserMedia({ 
