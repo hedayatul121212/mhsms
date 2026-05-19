@@ -3,196 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MHSMS - কলিং ও ছোট সার্চ বার আপডেট</title>
+    <title>MHSMS - কল নোটিফিকেশন ও রিংটোন সহ</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
-        /* লিকুইড অ্যানিমেটেড থিম ব্যাকগ্রাউন্ড */
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: linear-gradient(45deg, #ff758c, #ff7eb3, #a6c1ee, #fbc2eb);
-            background-size: 400% 400%;
-            animation: liquidBg 15s ease infinite;
-            display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; 
-        }
+        .app-container { width: 100%; max-width: 1000px; height: 85vh; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; overflow: hidden; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); position: relative; }
         
-        @keyframes liquidBg {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        .app-container { width: 100%; max-width: 1000px; height: 85vh; background: rgba(255, 255, 255, 0.85); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; overflow: hidden; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.6); position: relative; }
-        
-        .notice-board { position: absolute; top: 0; left: 0; width: 100%; background: #ff4d6d; color: white; padding: 10px 20px; font-weight: bold; text-align: center; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        /* Notice Board */
+        .notice-board { position: absolute; top: 0; left: 0; width: 100%; background: #ff4d6d; color: white; padding: 10px 20px; font-weight: bold; text-align: center; z-index: 100; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
         .notice-board button { background: none; border: none; color: white; font-weight: bold; cursor: pointer; }
 
-        /* কাস্টম লগইন ও রেজিস্ট্রেশন স্ক্রিন */
-        .auth-container { width: 100%; max-width: 420px; background: white; padding: 30px 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid #ffb7b2; z-index: 10; overflow-y: auto; max-height: 90vh; }
-        .auth-container h2 { margin-bottom: 15px; color: #ff6b6b; text-align: center; font-size: 1.8rem; }
-        .auth-tabs { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #ffe5ec; }
-        .auth-tab { padding: 10px; cursor: pointer; font-weight: bold; color: #666; width: 50%; text-align: center; }
-        .auth-tab.active { color: #ff4d6d; border-bottom: 3px solid #ff4d6d; }
-        
-        .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group label { display: block; font-size: 0.85rem; color: #55px; margin-bottom: 5px; font-weight: 600; }
-        .form-group input { width: 100%; padding: 10px 15px; border: 1px solid #ffccd5; border-radius: 25px; outline: none; font-size: 0.95rem; }
-        
-        .avatar-picker-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
-        .avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: #ffe5ec; display: flex; justify-content: center; align-items: center; font-size: 2rem; color: #ff758c; overflow: hidden; border: 2px dashed #ff758c; cursor: pointer; object-fit: cover; }
+        /* Incoming Call Overlay */
+        .call-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+        .call-avatar { width: 100px; height: 100px; border-radius: 50%; background: #ff4d6d; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-bottom: 20px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 77, 109, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); } }
+        .call-btns { display: flex; gap: 40px; margin-top: 30px; }
+        .call-btn { padding: 15px 30px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        .accept-btn { background: #28a745; color: white; }
+        .decline-btn { background: #dc3545; color: white; }
 
-        .submit-btn { width: 100%; padding: 12px; background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px; }
+        /* Auth Screen */
+        .auth-container { width: 100%; max-width: 400px; background: white; padding: 30px 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border: 2px solid #ffb7b2; z-index: 10; }
+        .auth-container h2 { margin-bottom: 20px; color: #ff6b6b; font-size: 1.8rem; }
+        .google-btn { width: 100%; padding: 12px; background: #fff; color: #444; border: 1px solid #ccc; border-radius: 25px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-        /* Sidebar & Friends */
-        .sidebar { width: 30%; border-right: 1px solid rgba(255, 183, 178, 0.5); display: flex; flex-direction: column; background: rgba(255, 245, 247, 0.6); padding-top: 40px; }
+        /* Sidebar & Chat Area */
+        .sidebar { width: 30%; border-right: 1px solid #ffe5ec; display: flex; flex-direction: column; background: #fff5f7; padding-top: 40px; }
         .sidebar-header { padding: 15px; background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; font-weight: bold; text-align: center; }
-        
-        /* 🔍 ছোট এবং মার্জিত সার্চ বক্স ডিজাইন */
-        .search-container { padding: 8px 12px; background: rgba(255, 240, 243, 0.4); border-bottom: 1px solid rgba(255, 229, 236, 0.4); }
-        .search-box { display: flex; gap: 4px; max-width: 90%; margin: 0 auto; }
-        .search-box input { flex: 1; padding: 5px 10px; border: 1px solid #ffccd5; border-radius: 12px; outline: none; font-size: 0.8rem; height: 28px; }
-        .search-box button { padding: 0 10px; background: #ff4d6d; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 0.75rem; font-weight: bold; height: 28px; }
-        
-        .search-result { background: #fff0f3; padding: 8px; border-bottom: 2px dashed #ffccd5; font-size: 0.85rem; max-height: 120px; overflow-y: auto; }
-        .search-result-item { display: flex; justify-content: space-between; align-items: center; background: white; padding: 6px; border-radius: 8px; border: 1px solid #ffccd5; margin-top: 4px; }
-        .add-friend-btn { padding: 3px 8px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
-
         .friend-list { flex: 1; overflow-y: auto; list-style: none; }
-        .friend-item { padding: 12px; border-bottom: 1px solid rgba(255, 229, 236, 0.5); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: 0.2s; }
-        .friend-item.active { background: rgba(255, 204, 213, 0.7); }
-        .remove-friend-btn { background: none; border: none; color: #dc3545; cursor: pointer; font-size: 0.9rem; display: none; }
-        .friend-item:hover .remove-friend-btn { display: block; }
-        
-        .avatar-container { position: relative; width: 40px; height: 40px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #ff758c; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; }
-        .status-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: #ccc; border: 2px solid white; border-radius: 50%; }
-        .status-dot.online { background: #28a745; }
+        .friend-item { padding: 12px; border-bottom: 1px solid #ffe5ec; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+        .friend-item.active { background: #ffccd5; }
+        .call-icon-btn { background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; }
 
-        /* Chat Area */
-        .chat-area { width: 70%; display: flex; flex-direction: column; background: rgba(255, 251, 251, 0.5); padding-top: 40px; }
-        
-        /* 📞 কলিং ফিচারের জন্য হেডার আপডেট */
-        .chat-header { padding: 10px 15px; background: rgba(255, 240, 243, 0.8); border-bottom: 1px solid rgba(255, 229, 236, 0.5); font-weight: bold; color: #ff4d6d; display: flex; justify-content: space-between; align-items: center; }
-        .call-buttons { display: flex; gap: 12px; }
-        .call-btn { background: none; border: none; font-size: 1.25rem; cursor: pointer; transition: transform 0.2s; padding: 4px; }
-        .call-btn:hover { transform: scale(1.15); }
-
+        .chat-area { width: 70%; display: flex; flex-direction: column; background: #fffbfb; padding-top: 40px; }
+        .chat-header { padding: 12px 15px; background: #fff0f3; border-bottom: 1px solid #ffe5ec; display: flex; justify-content: space-between; align-items: center; }
         .message-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        
-        .message-container { display: flex; align-items: center; width: 100%; gap: 8px; touch-action: pan-y; position: relative; transition: transform 0.1s linear; }
-        .message { padding: 12px 16px; border-radius: 20px; max-width: 65%; word-wrap: break-word; font-size: 0.95rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .message.incoming { background: white; border: 1px solid #eee; }
+        .message-container { display: flex; align-items: center; width: 100%; gap: 8px; }
+        .message { padding: 12px 16px; border-radius: 20px; max-width: 65%; word-wrap: break-word; }
+        .message.incoming { background: #f1f3f5; }
         .message.outgoing { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); color: white; }
         
-        .message img { max-width: 200px; border-radius: 10px; margin-top: 5px; display: block; }
-        .message audio { max-width: 240px; margin-top: 5px; display: block; }
+        .input-area { display: flex; padding: 15px; background: #fff0f3; }
+        .input-area input { flex: 1; padding: 12px 20px; border: 1px solid #ffccd5; border-radius: 30px; outline: none; }
+        .input-area button { background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; padding: 0 20px; margin-left: 10px; border-radius: 30px; cursor: pointer; }
 
-        .reply-in-msg { background: rgba(0, 0, 0, 0.05); padding: 5px 8px; border-left: 3px solid #ff4d6d; font-size: 0.8rem; margin-bottom: 5px; border-radius: 4px; color: #333; }
-        .msg-actions { display: none; gap: 3px; }
-        .message-container:hover .msg-actions { display: flex; }
-        .action-btn { border: none; background: rgba(0,0,0,0.05); cursor: pointer; padding: 2px 5px; font-size: 0.8rem; border-radius: 3px; }
-
-        .reply-preview { display: flex; justify-content: space-between; background: #ffe5ec; padding: 8px 15px; font-size: 0.85rem; border-top: 1px solid #ffccd5; }
-        
-        .input-area { display: flex; padding: 15px; background: rgba(255, 240, 243, 0.8); align-items: center; gap: 10px; }
-        .input-area input { flex: 1; padding: 12px 20px; border: 1px solid #ffccd5; border-radius: 30px; outline: none; background: white; }
-        
-        .media-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; transition: 0.2s; padding: 5px; }
-        .rec-active { color: red; animation: pulse 1s infinite; }
-        .send-btn { background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: bold; }
-        
+        .admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
+<div id="incomingCallScreen" class="call-overlay hidden">
+    <div class="call-avatar" id="callerAvatar">📞</div>
+    <h2 id="callerName">কেউ একজন কল দিচ্ছে...</h2>
+    <p style="color: #ccc; margin-top: 10px;">MHSMS Voice Call</p>
+    <div class="call-btns">
+        <button class="call-btn accept-btn" onclick="answerCall()">রিসিভ করুন ✅</button>
+        <button class="call-btn decline-btn" onclick="declineCall()">কেটে দিন ❌</button>
+    </div>
+</div>
+
 <div id="noticeBoard" class="notice-board hidden">
-    <span id="noticeText">📢 এখানে এডমিনের দেওয়া নোটিশ দেখাবে...</span>
+    <span id="noticeText">📢 নোটিশ...</span>
     <button onclick="closeNotice()">✕</button>
 </div>
 
 <div id="authScreen" class="auth-container">
-    <h2>MHSMS 🌸</h2>
-    <div class="auth-tabs">
-        <div id="tabLogin" class="auth-tab active" onclick="switchAuthTab('login')">লগইন</div>
-        <div id="tabRegister" class="auth-tab" onclick="switchAuthTab('register')">নিবন্ধন (Sign Up)</div>
-    </div>
-
-    <div id="loginFormSection">
-        <div class="form-group">
-            <label>জিমেইল (Gmail Address)</label>
-            <input type="text" id="loginEmail" placeholder="example@gmail.com">
-        </div>
-        <div class="form-group">
-            <label>পাসওয়ার্ড (Password)</label>
-            <input type="password" id="loginPassword" placeholder="••••••••">
-        </div>
-        <button class="submit-btn" onclick="handleCustomLogin()">প্রবেশ করুন</button>
-    </div>
-
-    <div id="registerFormSection" class="hidden">
-        <div class="avatar-picker-wrapper">
-            <label style="font-size: 0.85rem; font-weight: 600; margin-bottom: 5px;">প্রোফাইল পিকচার সিলেক্ট করুন</label>
-            <img id="avatarPreviewImg" class="avatar-preview" src="" alt="📷" onclick="document.getElementById('regAvatarInput').click()">
-            <input type="file" id="regAvatarInput" accept="image/*" class="hidden" onchange="previewRegAvatar(this)">
-        </div>
-        <div class="form-group">
-            <label>ইউজারনেম (Full Name/Username)</label>
-            <input type="text" id="regUsername" placeholder="আপনার নাম লিখুন">
-        </div>
-        <div class="form-group">
-            <label>জিমেইল (Gmail Address)</label>
-            <input type="text" id="regEmail" placeholder="example@gmail.com">
-        </div>
-        <div class="form-group">
-            <label>পাসওয়ার্ড (Password)</label>
-            <input type="password" id="regPassword" placeholder="কমপক্ষে ৬টি সংখ্যা/অক্ষর">
-        </div>
-        <button class="submit-btn" onclick="handleCustomRegister()">অ্যাকাউন্ট তৈরি করুন</button>
-    </div>
+    <h2>MHSMS-এ স্বাগতম 🌸</h2>
+    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">আপনার জিমেইল অ্যাকাউন্ট দিয়ে লগইন করুন।</p>
+    <button id="loginBtn" class="google-btn" onclick="handleGoogleAuth()">
+        <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/web-24dp/logo_googleg_color_web_24dp.png" alt="Google" width="20">
+        Gmail দিয়ে প্রবেশ করুন
+    </button>
 </div>
 
 <div id="appScreen" class="app-container hidden">
     <div class="sidebar">
-        <div class="sidebar-header">MHSMS</div>
-        
-        <div class="search-container">
-            <div class="search-box">
-                <input type="text" id="searchFriendInput" placeholder="বন্ধুর নাম...">
-                <button onclick="searchFriend()">খুঁজুন</button>
-            </div>
-        </div>
-        <div id="searchResultArea" class="search-result hidden"></div>
-
+        <div class="sidebar-header">MHSMS চ্যাট</div>
         <ul class="friend-list" id="friendList"></ul>
-        <div style="padding: 10px; background: transparent; text-align: center;">
-            <button style="width:100%; padding:8px; background:#dc3545; color:white; border:none; border-radius:20px; font-weight:bold; cursor:pointer;" onclick="handleLogout()">লগআউট 🚪</button>
+        <div style="padding: 10px; background: #fff; text-align: center;">
+            <button id="adminPanelBtn" style="padding:10px; background:#333; color:white; border:none; border-radius:20px; font-weight:bold; cursor:pointer;" class="hidden" onclick="openAdminPanel()">Admin Panel 🛠️</button>
+            <button style="width:100%; padding:8px; background:#dc3545; color:white; border:none; border-radius:20px; font-weight:bold; cursor:pointer; margin-top:5px;" onclick="handleLogout()">লগআউট 🚪</button>
         </div>
     </div>
     
     <div class="chat-area">
         <div class="chat-header">
-            <span id="currentChatUser">কোনো বন্ধু সিলেক্ট করুন</span>
-            <div class="call-buttons id="callBtnSection" class="hidden">
-                <button class="call-btn" onclick="makeCall('voice')">📞</button>
-                <button class="call-btn" onclick="makeCall('video')">📹</button>
-            </div>
+            <div id="currentChatUser" style="font-weight:bold; color:#ff4d6d;">কোনো বন্ধু সিলেক্ট করুন</div>
         </div>
         <div class="message-area" id="messageArea"></div>
-        
-        <div id="replyPreviewBox" class="reply-preview hidden">
-            <span id="replyPreviewText">রিপ্লাই...</span>
-            <button onclick="cancelReply()">✕</button>
-        </div>
-        
         <div class="input-area">
-            <button class="media-btn" onclick="document.getElementById('imageInput').click()">🖼️</button>
-            <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="sendImage(this)">
-            
-            <button class="media-btn" id="voiceBtn" onclick="toggleVoiceRecord()">🎙️</button>
-            
             <input type="text" id="messageInput" placeholder="মেসেজ লিখুন..." autocomplete="off">
-            <button id="sendBtn" class="send-btn" onclick="sendMessage()">পাঠান</button>
+            <button onclick="sendMessage()">পাঠান</button>
         </div>
     </div>
 </div>
@@ -216,197 +119,143 @@
     const auth = firebase.auth();
 
     let currentUser = null, currentUserEmail = null, activeChatFriend = null, unsubscribeChat = null;
-    let selectedReplyMsg = null, editMessageId = null;
-    let mediaRecorder = null, audioChunks = [];
-    let base64Avatar = "";
+    const ADMIN_EMAIL = "hedayatuli31@gmail.com"; 
+
+    // রিংটোন প্লেয়ার সেটআপ (এখানে আপনার রিংটোনের ডিরেক্ট MP3 লিংক বসাতে পারেন)
+    const ringtone = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
+    ringtone.loop = true; 
 
     window.onload = function() {
-        if (localStorage.getItem("mhsms_logged_email")) {
-            fastLoginSuccess(localStorage.getItem("mhsms_logged_name"), localStorage.getItem("mhsms_logged_email"), localStorage.getItem("mhsms_logged_avatar"));
+        // ব্রাউজারে নোটিফিকেশন পারমিশন চাওয়া
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        const hash = window.location.hash;
+        if (hash) {
+            const params = new URLSearchParams(hash.substring(1));
+            const idToken = params.get('id_token');
+            if (idToken) {
+                const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+                auth.signInWithCredential(credential).then(result => {
+                    history.replaceState(null, null, ' ');
+                    loginSuccess(result.user);
+                });
+                return;
+            }
+        }
+
+        const localEmail = localStorage.getItem("mhsms_logged_email");
+        if (localEmail) {
+            fastLoginSuccess(localStorage.getItem("mhsms_logged_name"), localEmail, localStorage.getItem("mhsms_logged_avatar"));
         }
         listenForGlobalNotice();
     };
 
-    function switchAuthTab(type) {
-        if (type === 'login') {
-            document.getElementById('tabLogin').classList.add('active');
-            document.getElementById('tabRegister').classList.remove('active');
-            document.getElementById('loginFormSection').classList.remove('hidden');
-            document.getElementById('registerFormSection').classList.add('hidden');
-        } else {
-            document.getElementById('tabLogin').classList.remove('active');
-            document.getElementById('tabRegister').classList.add('active');
-            document.getElementById('loginFormSection').classList.add('hidden');
-            document.getElementById('registerFormSection').classList.remove('hidden');
-        }
+    function handleGoogleAuth() {
+        const currentUrl = window.location.href.split('#')[0].split('?')[0];
+        const clientId = "120479258973-7bqtunh7020oev10v51l789l7aonjgn3.apps.googleusercontent.com";
+        window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(currentUrl)}&response_type=id_token&scope=openid%20profile%20email&nonce=mhsmsnonce&prompt=select_account`;
     }
 
-    function previewRegAvatar(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('avatarPreviewImg').src = e.target.result;
-                base64Avatar = e.target.result;
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    async function handleCustomRegister() {
-        const username = document.getElementById('regUsername').value.trim();
-        const email = document.getElementById('regEmail').value.trim().toLowerCase();
-        const password = document.getElementById('regPassword').value.trim();
-
-        if(!username || !email || !password) { alert("দয়া করে সবগুলো ঘর পূরণ করুন!"); return; }
-        if(password.length < 6) { alert("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে!"); return; }
-
-        try {
-            const usernameCheck = await db.collection("users").where("username", "==", username).get();
-            if(!usernameCheck.empty) { alert("এই ইউজারনেমটি ইতিমধ্যে ব্যবহৃত হয়েছে!"); return; }
-
-            await auth.createUserWithEmailAndPassword(email, password);
-            localStorage.setItem("mhsms_logged_email", email);
-            localStorage.setItem("mhsms_logged_name", username);
-            localStorage.setItem("mhsms_logged_avatar", base64Avatar);
-            
-            fastLoginSuccess(username, email, base64Avatar);
-        } catch (error) {
-            alert("নিবন্ধন ব্যর্থ হয়েছে: " + error.message);
-        }
-    }
-
-    async function handleCustomLogin() {
-        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-        const password = document.getElementById('loginPassword').value.trim();
-
-        if(!email || !password) { alert("জিমেইল এবং পাসওয়ার্ড লিখুন!"); return; }
-
-        try {
-            await auth.signInWithEmailAndPassword(email, password);
-            const userDoc = await db.collection("users").doc(email).get();
-            let name = email.split('@')[0];
-            let avatar = "";
-            if(userDoc.exists) {
-                name = userDoc.data().username || name;
-                avatar = userDoc.data().avatar || "";
-            }
-            
-            localStorage.setItem("mhsms_logged_email", email);
-            localStorage.setItem("mhsms_logged_name", name);
-            localStorage.setItem("mhsms_logged_avatar", avatar);
-            
-            fastLoginSuccess(name, email, avatar);
-        } catch (error) {
-            alert("লগইন ব্যর্থ হয়েছে: " + error.message);
-        }
+    function loginSuccess(user) {
+        localStorage.setItem("mhsms_logged_email", user.email);
+        localStorage.setItem("mhsms_logged_name", user.displayName || user.email.split('@')[0]);
+        localStorage.setItem("mhsms_logged_avatar", user.photoURL || "");
+        fastLoginSuccess(user.displayName, user.email, user.photoURL);
     }
 
     function fastLoginSuccess(name, email, avatar) {
         currentUser = name; currentUserEmail = email;
         document.getElementById('authScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
-        db.collection("users").doc(currentUserEmail).set({ username: currentUser, email: currentUserEmail, avatar: avatar, lastActive: Date.now(), isOnline: true }, { merge: true });
-        loadFriends();
-    }
-
-    async function searchFriend() {
-        const searchInput = document.getElementById('searchFriendInput').value.trim();
-        const resultArea = document.getElementById('searchResultArea');
+        if (currentUserEmail === ADMIN_EMAIL) document.getElementById('adminPanelBtn').classList.remove('hidden');
         
-        if(!searchInput) { resultArea.classList.add('hidden'); return; }
-        if(searchInput === currentUser) { alert("আপনি নিজের নাম সার্চ করতে পারবেন না!"); return; }
+        db.collection("users").doc(currentUserEmail).set({
+            username: currentUser, email: currentUserEmail, avatar: avatar, lastActive: Date.now(), isOnline: true
+        }, { merge: true });
 
-        resultArea.classList.remove('hidden');
-        resultArea.innerHTML = `<p style="font-size:0.75rem;color:#666;">খোঁজা হচ্ছে...</p>`;
-
-        try {
-            const snapshot = await db.collection("users").where("username", "==", searchInput).get();
-            if(!snapshot.empty) {
-                resultArea.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const div = document.createElement('div');
-                    div.classList.add('search-result-item');
-                    div.innerHTML = `
-                        <span>🌸 <b>${data.username}</b></span>
-                        <button class="add-friend-btn" onclick="addFriendToList('${data.email}')">অ্যাড</button>
-                    `;
-                    resultArea.appendChild(div);
-                });
-            } else {
-                resultArea.innerHTML = `<p style="font-size:0.75rem;color:red;">ইউজার পাওয়া যায়নি!</p>`;
-            }
-        } catch (error) {
-            resultArea.innerHTML = `<p style="font-size:0.75rem;color:red;">ত্রুটি ঘটেছে!</p>`;
-        }
+        loadFriends();
+        listenForIncomingCalls(); // ইনকামিং কল লিসেনার চালু
     }
 
-    async function addFriendToList(friendEmail) {
-        try {
-            await db.collection("users").doc(currentUserEmail).collection("myFriends").doc(friendEmail).set({ addedAt: Date.now() });
-            await db.collection("users").doc(friendEmail).collection("myFriends").doc(currentUserEmail).set({ addedAt: Date.now() });
-            
-            alert("বন্ধু সফলভাবে যুক্ত হয়েছে! 🌸");
-            document.getElementById('searchResultArea').classList.add('hidden');
-            document.getElementById('searchFriendInput').value = "";
-        } catch (error) {
-            alert("অ্যাড করতে সমস্যা হয়েছে: " + error.message);
-        }
-    }
-
-    async function removeFriend(friendEmail) {
-        if(confirm("আপনি কি এই বন্ধুকে লিস্ট থেকে সরাতে চান?")) {
-            await db.collection("users").doc(currentUserEmail).collection("myFriends").doc(friendEmail).delete();
-            if(activeChatFriend === friendEmail) {
-                activeChatFriend = null;
-                document.getElementById('currentChatUser').innerText = "কোনো বন্ধু সিলেক্ট করুন";
-                document.getElementById('messageArea').innerHTML = "";
-            }
-        }
-    }
-
-    function loadFriends() {
-        db.collection("users").doc(currentUserEmail).collection("myFriends").onSnapshot(snapshot => {
-            const list = document.getElementById('friendList'); list.innerHTML = '';
-            if(snapshot.empty) {
-                list.innerHTML = `<p style="text-align:center; font-size:0.8rem; color:#888; padding:20px;">উপরে নাম সার্চ করে বন্ধু অ্যাড করুন! 🌸</p>`;
-                return;
-            }
-            snapshot.forEach(async (friendDoc) => {
-                const friendEmail = friendDoc.id;
-                const userDoc = await db.collection("users").doc(friendEmail).get();
-                if(userDoc.exists) {
-                    const data = userDoc.data();
-                    const isOnline = data.isOnline && (Date.now() - data.lastActive < 180000);
-                    const li = document.createElement('li'); li.classList.add('friend-item');
-                    if (activeChatFriend === data.email) li.classList.add('active');
-                    let avatarContent = data.avatar ? `<img src="${data.avatar}" class="user-avatar">` : `<div class="user-avatar">${data.username.charAt(0).toUpperCase()}</div>`;
-                    
-                    li.innerHTML = `
-                        <div style="display:flex; align-items:center; gap:12px;" onclick="selectFriendChat('${data.email}', '${data.username}')">
-                            <div class="avatar-container">${avatarContent}<div class="status-dot ${isOnline?'online':''}"></div></div>
-                            <div><span>🌸 ${data.username}</span></div>
-                        </div>
-                        <button class="remove-friend-btn" onclick="removeFriend('${data.email}')">❌</button>
-                    `;
-                    list.appendChild(li);
-                }
-            });
+    // কাউকে কল দেওয়ার ফাংশন
+    async function startCall(friendEmail, friendName) {
+        alert(friendName + "-কে কল দেওয়া হচ্ছে...");
+        await db.collection("calls").doc(friendEmail).set({
+            callerName: currentUser,
+            callerEmail: currentUserEmail,
+            status: "ringing",
+            timestamp: Date.now()
         });
     }
 
-    function selectFriendChat(email, name) {
-        activeChatFriend = email; 
-        document.getElementById('currentChatUser').innerText = `চ্যাট উইথ: ${name}`; 
-        loadMessages();
-        const items = document.querySelectorAll('.friend-item');
-        items.forEach(item => item.classList.remove('active'));
+    // ইনকামিং কল এবং রিংটোন লিসেনার
+    function listenForIncomingCalls() {
+        db.collection("calls").doc(currentUserEmail).onSnapshot(doc => {
+            if (doc.exists) {
+                const callData = doc.data();
+                if (callData.status === "ringing") {
+                    // ১. স্ক্রিনে কলিং পপআপ দেখানো
+                    document.getElementById("callerName").innerText = `${callData.callerName} আপনাকে কল দিচ্ছেন...`;
+                    document.getElementById("incomingCallScreen").classList.remove("hidden");
+                    
+                    // ২. রিংটোন বাজানো
+                    ringtone.play().catch(e => console.log("অডিও প্লে করতে ইউজারের ইন্টারঅ্যাকশন লাগবে।"));
+
+                    // ৩. পুশ নোটিফিকেশন পাঠানো (যদি অ্যাপ ব্যাকগ্রাউন্ডে থাকে)
+                    if (Notification.permission === "granted") {
+                        new Notification("MHSMS Incoming Call", {
+                            body: `${callData.callerName} ইজ কলিং ইউ...`,
+                            icon: "https://fonts.gstatic.com/s/i/productlogos/googleg/v6/web-24dp/logo_googleg_color_web_24dp.png"
+                        });
+                    }
+                } else if (callData.status === "ended") {
+                    stopRingtoneAndClose();
+                }
+            }
+        });
     }
 
-    // 📞 কলিং নোটিফিকেশন ফাংশন
-    function makeCall(type) {
-        if(!activeChatFriend) return;
-        alert(`${type === 'voice' ? '📞 ভয়েস কল' : '📹 ভিডিও কল'} ফিচারটি শীঘ্রই যুক্ত করা হচ্ছে! বর্তমানে রিয়েল-টাইম কানেক্টিভিটি চেক করা হচ্ছে।`);
+    function answerCall() {
+        ringtone.pause();
+        alert("কল রিসিভ হয়েছে! (ভিডিও/অডিও স্ট্রিম এখানে যুক্ত হবে)");
+        db.collection("calls").doc(currentUserEmail).delete();
+        document.getElementById("incomingCallScreen").classList.add("hidden");
+    }
+
+    async function declineCall() {
+        stopRingtoneAndClose();
+        await db.collection("calls").doc(currentUserEmail).set({ status: "ended" }, { merge: true });
+        setTimeout(() => { db.collection("calls").doc(currentUserEmail).delete(); }, 2000);
+    }
+
+    function stopRingtoneAndClose() {
+        ringtone.pause();
+        ringtone.currentTime = 0;
+        document.getElementById("incomingCallScreen").classList.add("hidden");
+    }
+
+    // ফ্রেন্ড লিস্ট লোড এবং কল বাটন যুক্ত করা
+    function loadFriends() {
+        db.collection("users").onSnapshot(snapshot => {
+            const list = document.getElementById('friendList'); list.innerHTML = '';
+            snapshot.forEach(doc => {
+                const data = doc.data(); if (data.email === currentUserEmail) return;
+                
+                const li = document.createElement('li'); li.classList.add('friend-item');
+                li.innerHTML = `
+                    <span>🌸 ${data.username}</span>
+                    <button class="call-icon-btn" onclick="event.stopPropagation(); startCall('${data.email}', '${data.username}')">📞 কল</button>
+                `;
+                li.onclick = () => {
+                    activeChatFriend = data.email;
+                    document.getElementById('currentChatUser').innerText = `চ্যাট উইথ: ${data.username}`;
+                    loadMessages();
+                };
+                list.appendChild(li);
+            });
+        });
     }
 
     function loadMessages() {
@@ -415,44 +264,12 @@
         unsubscribeChat = db.collection("chats").doc(chatId).collection("messages").orderBy("timestamp", "asc").onSnapshot(snapshot => {
             const area = document.getElementById('messageArea'); area.innerHTML = '';
             snapshot.forEach(doc => {
-                const data = doc.data(); const msgId = doc.id; const isOwn = data.sender === currentUserEmail;
+                const data = doc.data(); const isOwn = data.sender === currentUserEmail;
                 const container = document.createElement('div'); container.classList.add('message-container');
                 container.style.justifyContent = isOwn ? 'flex-end' : 'flex-start';
-                
                 const msgDiv = document.createElement('div'); msgDiv.classList.add('message', isOwn?'outgoing':'incoming');
-                
-                let contentHTML = '';
-                if(data.replyTo) contentHTML += `<div class="reply-in-msg"><b>↪ ${data.replyTo.senderName}:</b> ${data.replyTo.text}</div>`;
-                if(data.type === 'image') contentHTML += `<img src="${data.fileUrl}">`;
-                else if(data.type === 'audio') contentHTML += `<audio src="${data.fileUrl}" controls></audio>`;
-                else contentHTML += `<div>${data.text}</div>`;
-                
-                msgDiv.innerHTML = contentHTML;
-
-                const actionsDiv = document.createElement('div'); actionsDiv.classList.add('msg-actions');
-                let deleteBtn = isOwn ? `<button class="action-btn" onclick="deleteMessage('${msgId}')">🗑️</button>` : '';
-                let editBtn = (isOwn && !data.type) ? `<button class="action-btn" onclick="startEditMessage('${msgId}', '${data.text}')">✏></button>` : '';
-                actionsDiv.innerHTML = editBtn + deleteBtn;
-
-                if(isOwn) { container.appendChild(actionsDiv); container.appendChild(msgDiv); }
-                else { container.appendChild(msgDiv); container.appendChild(actionsDiv); }
-                
-                let startX = 0;
-                container.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; });
-                container.addEventListener('touchmove', (e) => {
-                    let moveX = e.touches[0].clientX - startX;
-                    if (moveX > 0 && moveX < 80) container.style.transform = `translateX(${moveX}px)`;
-                });
-                container.addEventListener('touchend', (e) => {
-                    let finalX = e.changedTouches[0].clientX - startX;
-                    container.style.transform = 'translateX(0px)';
-                    if (finalX > 50) {
-                        let previewText = data.type === 'image' ? '🖼️ ছবি' : (data.type === 'audio' ? '🎙️ ভয়েস মেসেজ' : data.text);
-                        startReplyMessage(data.sender, isOwn ? 'নিজে' : 'বন্ধু', previewText);
-                    }
-                });
-
-                area.appendChild(container);
+                msgDiv.innerText = data.text;
+                container.appendChild(msgDiv); area.appendChild(container);
             });
             area.scrollTop = area.scrollHeight;
         });
@@ -461,60 +278,10 @@
     async function sendMessage() {
         const input = document.getElementById('messageInput'); const text = input.value.trim(); if (!text || !activeChatFriend) return;
         const chatId = [currentUserEmail, activeChatFriend].sort().join('_');
-        if (editMessageId) {
-            await db.collection("chats").doc(chatId).collection("messages").doc(editMessageId).update({ text });
-            editMessageId = null; document.getElementById('sendBtn').innerText = "পাঠান";
-        } else {
-            await db.collection("chats").doc(chatId).collection("messages").add({ sender: currentUserEmail, text, timestamp: Date.now(), replyTo: selectedReplyMsg });
-        }
-        input.value = ''; cancelReply();
+        await db.collection("chats").doc(chatId).collection("messages").add({ sender: currentUserEmail, text, timestamp: Date.now() });
+        input.value = '';
     }
 
-    function sendImage(input) {
-        if (!input.files || !input.files[0] || !activeChatFriend) return;
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            const chatId = [currentUserEmail, activeChatFriend].sort().join('_');
-            await db.collection("chats").doc(chatId).collection("messages").add({
-                sender: currentUserEmail, type: 'image', fileUrl: e.target.result, timestamp: Date.now(), replyTo: selectedReplyMsg
-            });
-            cancelReply();
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-
-    async function toggleVoiceRecord() {
-        const btn = document.getElementById('voiceBtn');
-        if (!mediaRecorder || mediaRecorder.state === "inactive") {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            mediaRecorder = new MediaRecorder(stream);
-            audioChunks = [];
-            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-            mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                const reader = new FileReader();
-                reader.onloadend = async function() {
-                    const chatId = [currentUserEmail, activeChatFriend].sort().join('_');
-                    await db.collection("chats").doc(chatId).collection("messages").add({
-                        sender: currentUserEmail, type: 'audio', fileUrl: reader.result, timestamp: Date.now(), replyTo: selectedReplyMsg
-                    });
-                    cancelReply();
-                };
-                reader.readAsDataURL(audioBlob);
-            };
-            mediaRecorder.start();
-            btn.classList.add('rec-active');
-        } else {
-            mediaRecorder.stop();
-            btn.classList.remove('rec-active');
-        }
-    }
-
-    function startReplyMessage(senderEmail, senderName, text) { selectedReplyMsg = { sender: senderEmail, senderName, text }; document.getElementById('replyPreviewText').innerText = `Reply to ${senderName}: ${text}`; document.getElementById('replyPreviewBox').classList.remove('hidden'); }
-    function cancelReply() { selectedReplyMsg = null; document.getElementById('replyPreviewBox').classList.add('hidden'); }
-    function startEditMessage(id, oldText) { editMessageId = id; document.getElementById('messageInput').value = oldText; document.getElementById('sendBtn').innerText = "আপডেট"; }
-    async function deleteMessage(id) { if(confirm("ডিলিট করতে চান?")) { const chatId = [currentUserEmail, activeChatFriend].sort().join('_'); await db.collection("chats").doc(chatId).collection("messages").doc(id).delete(); } }
-    
     function listenForGlobalNotice() {
         db.collection("settings").doc("announcement").onSnapshot(doc => {
             if (doc.exists && doc.data().active) {
