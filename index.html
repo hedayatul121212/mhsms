@@ -3,87 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MHSMS - কল নোটিফিকেশন ও রিংটোন সহ</title>
+    <title>MHSMS - ১০০% ফিক্সড জিমেইল লগইন</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
         
         .app-container { width: 100%; max-width: 1000px; height: 85vh; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; overflow: hidden; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); position: relative; }
         
-        /* Notice Board */
-        .notice-board { position: absolute; top: 0; left: 0; width: 100%; background: #ff4d6d; color: white; padding: 10px 20px; font-weight: bold; text-align: center; z-index: 100; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
-        .notice-board button { background: none; border: none; color: white; font-weight: bold; cursor: pointer; }
-
-        /* Incoming Call Overlay */
-        .call-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
-        .call-avatar { width: 100px; height: 100px; border-radius: 50%; background: #ff4d6d; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; margin-bottom: 20px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255, 77, 109, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); } }
-        .call-btns { display: flex; gap: 40px; margin-top: 30px; }
-        .call-btn { padding: 15px 30px; border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
-        .accept-btn { background: #28a745; color: white; }
-        .decline-btn { background: #dc3545; color: white; }
+        /* Global Notice Board */
+        .notice-board { position: absolute; top: 0; left: 0; width: 100%; background: #ff4d6d; color: white; padding: 10px 20px; font-weight: bold; text-align: center; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
+        .notice-board button { background: none; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
 
         /* Auth Screen */
         .auth-container { width: 100%; max-width: 400px; background: white; padding: 30px 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; border: 2px solid #ffb7b2; z-index: 10; }
         .auth-container h2 { margin-bottom: 20px; color: #ff6b6b; font-size: 1.8rem; }
-        .google-btn { width: 100%; padding: 12px; background: #fff; color: #444; border: 1px solid #ccc; border-radius: 25px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* Google Button Style */
+        .google-btn { width: 100%; padding: 12px; background: #fff; color: #444; border: 1px solid #ccc; border-radius: 25px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1rem; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .google-btn:hover { background: #f1f1f1; }
+        .google-btn img { width: 20px; height: 20px; }
 
-        /* Sidebar & Chat Area */
+        /* Loading Spinner */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #ff4d6d; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 15px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Sidebar & Friends */
         .sidebar { width: 30%; border-right: 1px solid #ffe5ec; display: flex; flex-direction: column; background: #fff5f7; padding-top: 40px; }
-        .sidebar-header { padding: 15px; background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; font-weight: bold; text-align: center; }
+        .sidebar-header { padding: 15px; background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; font-weight: bold; font-size: 1.3rem; text-align: center; }
         .friend-list { flex: 1; overflow-y: auto; list-style: none; }
-        .friend-item { padding: 12px; border-bottom: 1px solid #ffe5ec; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+        .friend-item { padding: 12px; border-bottom: 1px solid #ffe5ec; cursor: pointer; display: flex; align-items: center; gap: 12px; }
         .friend-item.active { background: #ffccd5; }
-        .call-icon-btn { background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 15px; cursor: pointer; font-size: 0.8rem; }
+        
+        .avatar-container { position: relative; display: inline-block; width: 40px; height: 40px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #ff758c; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; }
+        .status-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: #ccc; border: 2px solid white; border-radius: 50%; }
+        .status-dot.online { background: #28a745; }
 
+        /* Chat Area */
         .chat-area { width: 70%; display: flex; flex-direction: column; background: #fffbfb; padding-top: 40px; }
         .chat-header { padding: 12px 15px; background: #fff0f3; border-bottom: 1px solid #ffe5ec; display: flex; justify-content: space-between; align-items: center; }
         .message-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        
         .message-container { display: flex; align-items: center; width: 100%; gap: 8px; }
-        .message { padding: 12px 16px; border-radius: 20px; max-width: 65%; word-wrap: break-word; }
+        .message { padding: 12px 16px; border-radius: 20px; max-width: 65%; word-wrap: break-word; font-size: 0.95rem; }
         .message.incoming { background: #f1f3f5; }
         .message.outgoing { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); color: white; }
-        
+        .reply-in-msg { background: rgba(0, 0, 0, 0.05); padding: 5px; border-left: 3px solid #ff4d6d; font-size: 0.8rem; margin-bottom: 5px; }
+        .msg-actions { display: none; gap: 3px; }
+        .message-container:hover .msg-actions { display: flex; }
+        .action-btn { border: none; background: rgba(0,0,0,0.05); cursor: pointer; padding: 2px 5px; font-size: 0.8rem; }
+
+        .reply-preview { display: flex; justify-content: space-between; background: #ffe5ec; padding: 8px 15px; font-size: 0.85rem; }
         .input-area { display: flex; padding: 15px; background: #fff0f3; }
         .input-area input { flex: 1; padding: 12px 20px; border: 1px solid #ffccd5; border-radius: 30px; outline: none; }
-        .input-area button { background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; padding: 0 20px; margin-left: 10px; border-radius: 30px; cursor: pointer; }
+        .input-area button { background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; padding: 0 20px; margin-left: 10px; border-radius: 30px; cursor: pointer; font-weight: bold; }
 
+        /* Admin Panel Dashboard */
         .admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 3000; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff4d6d; padding-bottom: 10px; margin-bottom: 20px; }
+        .admin-box { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ddd; }
+        .admin-box input { width: 70%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .admin-box button { padding: 10px 20px; background: #ff4d6d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        
+        .user-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .user-table th, .user-table td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 0.9rem; }
+        .user-table th { background-color: #ffccd5; color: #333; }
+        
+        .admin-toggle-btn { padding: 10px; background: #333; color: white; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; margin-top: 5px; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<div id="incomingCallScreen" class="call-overlay hidden">
-    <div class="call-avatar" id="callerAvatar">📞</div>
-    <h2 id="callerName">কেউ একজন কল দিচ্ছে...</h2>
-    <p style="color: #ccc; margin-top: 10px;">MHSMS Voice Call</p>
-    <div class="call-btns">
-        <button class="call-btn accept-btn" onclick="answerCall()">রিসিভ করুন ✅</button>
-        <button class="call-btn decline-btn" onclick="declineCall()">কেটে দিন ❌</button>
-    </div>
-</div>
-
 <div id="noticeBoard" class="notice-board hidden">
-    <span id="noticeText">📢 নোটিশ...</span>
+    <span id="noticeText">📢 এখানে এডমিনের দেওয়া নোটিশ দেখাবে...</span>
     <button onclick="closeNotice()">✕</button>
 </div>
 
 <div id="authScreen" class="auth-container">
     <h2>MHSMS-এ স্বাগতম 🌸</h2>
-    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">আপনার জিমেইল অ্যাকাউন্ট দিয়ে লগইন করুন।</p>
+    <p style="color:#666; font-size:0.9rem; margin-bottom:20px;">আপনার জিমেইল অ্যাকাউন্ট দিয়ে সহজেই লগইন বা রেজিস্টার করুন।</p>
+    
     <button id="loginBtn" class="google-btn" onclick="handleGoogleAuth()">
-        <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/web-24dp/logo_googleg_color_web_24dp.png" alt="Google" width="20">
+        <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/web-24dp/logo_googleg_color_web_24dp.png" alt="Google Logo">
         Gmail দিয়ে প্রবেশ করুন
     </button>
+    <div id="loadingSpinner" class="hidden">
+        <div class="loader"></div>
+        <p style="font-size:0.85rem; color:#666;">অপেক্ষা করুন, লগইন হচ্ছে...</p>
+    </div>
 </div>
 
 <div id="appScreen" class="app-container hidden">
     <div class="sidebar">
-        <div class="sidebar-header">MHSMS চ্যাট</div>
+        <div class="sidebar-header">MHSMS</div>
+        <div class="add-friend-box" style="padding:10px; display:flex; gap:5px;">
+            <input type="text" id="friendUsername" placeholder="বন্ধুর ইমেইল/নাম..." style="flex:1; padding:8px; border-radius:15px; border:1px solid #ccc; outline:none;">
+            <button onclick="addFriend()" style="padding:5px 10px; background:#ff4d6d; color:white; border:none; border-radius:15px; cursor:pointer;">অ্যাড</button>
+        </div>
         <ul class="friend-list" id="friendList"></ul>
         <div style="padding: 10px; background: #fff; text-align: center;">
-            <button id="adminPanelBtn" style="padding:10px; background:#333; color:white; border:none; border-radius:20px; font-weight:bold; cursor:pointer;" class="hidden" onclick="openAdminPanel()">Admin Panel 🛠️</button>
+            <button id="adminPanelBtn" class="admin-toggle-btn hidden" onclick="openAdminPanel()">Admin Panel 🛠️</button>
             <button style="width:100%; padding:8px; background:#dc3545; color:white; border:none; border-radius:20px; font-weight:bold; cursor:pointer; margin-top:5px;" onclick="handleLogout()">লগআউট 🚪</button>
         </div>
     </div>
@@ -93,10 +113,42 @@
             <div id="currentChatUser" style="font-weight:bold; color:#ff4d6d;">কোনো বন্ধু সিলেক্ট করুন</div>
         </div>
         <div class="message-area" id="messageArea"></div>
+        <div id="replyPreviewBox" class="reply-preview hidden">
+            <span id="replyPreviewText">রিপ্লাই...</span>
+            <button onclick="cancelReply()">✕</button>
+        </div>
         <div class="input-area">
             <input type="text" id="messageInput" placeholder="মেসেজ লিখুন..." autocomplete="off">
-            <button onclick="sendMessage()">পাঠান</button>
+            <button id="sendBtn" onclick="sendMessage()">পাঠান</button>
         </div>
+    </div>
+</div>
+
+<div id="adminPanel" class="admin-panel hidden">
+    <div class="admin-header">
+        <h2>MHSMS এডমিন কন্ট্রোল প্যানেল 🛠️</h2>
+        <button style="padding:10px 20px; background:#333; color:white; border:none; cursor:pointer; font-weight:bold;" onclick="closeAdminPanel()">Close ✕</button>
+    </div>
+    
+    <div class="admin-box">
+        <h3>১. নতুন অ্যানাউন্সমেন্ট / নোটিশ জারি করুন</h3>
+        <input type="text" id="newNoticeInput" placeholder="এখানে নতুন নোটিশটি লিখুন...">
+        <button onclick="postNotice()">Update Notice 📢</button>
+    </div>
+
+    <div class="admin-box">
+        <h3>২. নিবন্ধিত ইউজারদের তালিকা (ডিভাইস ও লোকেশন ট্র্যাকিং)</h3>
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>নাম / জিমেইল</th>
+                    <th>ডিভাইসের নাম</th>
+                    <th>অবস্থান (Location)</th>
+                    <th>অ্যাকশন</th>
+                </tr>
+            </thead>
+            <tbody id="adminUserTableBody"></tbody>
+        </table>
     </div>
 </div>
 
@@ -118,135 +170,202 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
 
-    let currentUser = null, currentUserEmail = null, activeChatFriend = null, unsubscribeChat = null;
+    let currentUser = null;
+    let currentUserEmail = null;
+    let activeChatFriend = null;
+    let unsubscribeChat = null;
+    let selectedReplyMsg = null;
+    let editMessageId = null;
+
     const ADMIN_EMAIL = "hedayatuli31@gmail.com"; 
 
-    // রিংটোন প্লেয়ার সেটআপ (এখানে আপনার রিংটোনের ডিরেক্ট MP3 লিংক বসাতে পারেন)
-    const ringtone = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
-    ringtone.loop = true; 
+    function getDeviceName() {
+        const ua = navigator.userAgent;
+        if (/android/i.test(ua)) return "Android Phone";
+        if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return "iPhone/iOS";
+        if (/windows nt/i.test(ua)) return "Windows PC";
+        if (/macintosh|mac os x/i.test(ua)) return "MacBook/Mac";
+        return "Unknown Device";
+    }
+
+    async function getUserLocation() {
+        try {
+            let res = await fetch('https://ipapi.co/json/');
+            let data = await res.json();
+            return data.city && data.country_name ? `${data.city}, ${data.country_name}` : "Unknown Location";
+        } catch (e) { return "Bangladesh"; }
+    }
 
     window.onload = function() {
-        // ব্রাউজারে নোটিফিকেশন পারমিশন চাওয়া
-        if (Notification.permission !== "granted") {
-            Notification.requestPermission();
-        }
-
+        // ১. রিটার্নিং টোকেন হ্যান্ডেলার (গুগল থেকে ঘুরে আসার পর ডাটা রিড করা)
         const hash = window.location.hash;
         if (hash) {
             const params = new URLSearchParams(hash.substring(1));
             const idToken = params.get('id_token');
             if (idToken) {
+                document.getElementById('loginBtn').classList.add('hidden');
+                document.getElementById('loadingSpinner').classList.remove('hidden');
+                
+                // গুগলের সিকিউর টোকেন দিয়ে ফায়ারবেসে সাইন-ইন সম্পন্ন করা
                 const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
                 auth.signInWithCredential(credential).then(result => {
-                    history.replaceState(null, null, ' ');
+                    window.location.hash = ""; // URL পরিষ্কার করা
                     loginSuccess(result.user);
+                }).catch(err => {
+                    alert("অথেন্টিকেশন ফিল্ড: " + err.message);
+                    handleLogoutUI();
                 });
                 return;
             }
         }
 
+        // ২. সাধারণ সেশন চেকার
         const localEmail = localStorage.getItem("mhsms_logged_email");
+        const localName = localStorage.getItem("mhsms_logged_name");
+        const localAvatar = localStorage.getItem("mhsms_logged_avatar");
+
         if (localEmail) {
-            fastLoginSuccess(localStorage.getItem("mhsms_logged_name"), localEmail, localStorage.getItem("mhsms_logged_avatar"));
+            // লোকাল ডাটা দিয়ে দ্রুত চ্যাট স্ক্রিন অন করা
+            fastLoginSuccess(localName, localEmail, localAvatar);
+        } else {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    loginSuccess(user);
+                } else {
+                    handleLogoutUI();
+                }
+            });
         }
         listenForGlobalNotice();
     };
 
+    // মোবাইল এনভায়রনমেন্ট (WebView/APK) ফ্রেন্ডলি ওয়ান-ক্লিক কাস্টম অথেন্টিকেশন ফ্লো
     function handleGoogleAuth() {
-        const currentUrl = window.location.href.split('#')[0].split('?')[0];
-        const clientId = "120479258973-7bqtunh7020oev10v51l789l7aonjgn3.apps.googleusercontent.com";
-        window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(currentUrl)}&response_type=id_token&scope=openid%20profile%20email&nonce=mhsmsnonce&prompt=select_account`;
+        document.getElementById('loginBtn').classList.add('hidden');
+        document.getElementById('loadingSpinner').classList.remove('hidden');
+
+        const currentUrl = window.location.href.split('#')[0];
+        // গুগল ও অথ এপিআই-এর ওপেন গেটওয়ে ইউআরএল জেনারেশন
+        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+            `client_id=120479258973-7bqtunh7020oev10v51l789l7aonjgn3.apps.googleusercontent.com` + 
+            `&redirect_uri=${encodeURIComponent(currentUrl)}` +
+            `&response_type=id_token` +
+            `&scope=openid%20profile%20email` +
+            `&nonce=mhsmsnonce` +
+            `&prompt=select_account`;
+
+        // ব্রাউজারের মেইন উইন্ডো ব্যবহার করে রিডাইরেক্ট (লগইন উইন্ডো ব্লক হবে না)
+        window.location.href = googleAuthUrl;
     }
 
-    function loginSuccess(user) {
-        localStorage.setItem("mhsms_logged_email", user.email);
-        localStorage.setItem("mhsms_logged_name", user.displayName || user.email.split('@')[0]);
-        localStorage.setItem("mhsms_logged_avatar", user.photoURL || "");
-        fastLoginSuccess(user.displayName, user.email, user.photoURL);
+    async function loginSuccess(user) {
+        currentUser = user.displayName || user.email.split('@')[0];
+        currentUserEmail = user.email;
+        let avatarUrl = user.photoURL || "";
+
+        // সেশন লোকাল স্টোরেজে রাখা যেন প্রতিবার অ্যাপ ওপেন করলে লগইন স্ক্রিন না আসে
+        localStorage.setItem("mhsms_logged_email", currentUserEmail);
+        localStorage.setItem("mhsms_logged_name", currentUser);
+        localStorage.setItem("mhsms_logged_avatar", avatarUrl);
+
+        fastLoginSuccess(currentUser, currentUserEmail, avatarUrl);
     }
 
-    function fastLoginSuccess(name, email, avatar) {
-        currentUser = name; currentUserEmail = email;
+    async function fastLoginSuccess(name, email, avatar) {
+        currentUser = name;
+        currentUserEmail = email;
+
         document.getElementById('authScreen').classList.add('hidden');
         document.getElementById('appScreen').classList.remove('hidden');
-        if (currentUserEmail === ADMIN_EMAIL) document.getElementById('adminPanelBtn').classList.remove('hidden');
         
-        db.collection("users").doc(currentUserEmail).set({
-            username: currentUser, email: currentUserEmail, avatar: avatar, lastActive: Date.now(), isOnline: true
+        if (currentUserEmail === ADMIN_EMAIL) {
+            document.getElementById('adminPanelBtn').classList.remove('hidden');
+        }
+
+        const device = getDeviceName();
+        const location = await getUserLocation();
+
+        await db.collection("users").doc(currentUserEmail).set({
+            username: currentUser,
+            email: currentUserEmail,
+            avatar: avatar,
+            lastActive: Date.now(),
+            isOnline: true,
+            device, location
         }, { merge: true });
 
         loadFriends();
-        listenForIncomingCalls(); // ইনকামিং কল লিসেনার চালু
     }
 
-    // কাউকে কল দেওয়ার ফাংশন
-    async function startCall(friendEmail, friendName) {
-        alert(friendName + "-কে কল দেওয়া হচ্ছে...");
-        await db.collection("calls").doc(friendEmail).set({
-            callerName: currentUser,
-            callerEmail: currentUserEmail,
-            status: "ringing",
-            timestamp: Date.now()
-        });
-    }
-
-    // ইনকামিং কল এবং রিংটোন লিসেনার
-    function listenForIncomingCalls() {
-        db.collection("calls").doc(currentUserEmail).onSnapshot(doc => {
-            if (doc.exists) {
-                const callData = doc.data();
-                if (callData.status === "ringing") {
-                    // ১. স্ক্রিনে কলিং পপআপ দেখানো
-                    document.getElementById("callerName").innerText = `${callData.callerName} আপনাকে কল দিচ্ছেন...`;
-                    document.getElementById("incomingCallScreen").classList.remove("hidden");
-                    
-                    // ২. রিংটোন বাজানো
-                    ringtone.play().catch(e => console.log("অডিও প্লে করতে ইউজারের ইন্টারঅ্যাকশন লাগবে।"));
-
-                    // ৩. পুশ নোটিফিকেশন পাঠানো (যদি অ্যাপ ব্যাকগ্রাউন্ডে থাকে)
-                    if (Notification.permission === "granted") {
-                        new Notification("MHSMS Incoming Call", {
-                            body: `${callData.callerName} ইজ কলিং ইউ...`,
-                            icon: "https://fonts.gstatic.com/s/i/productlogos/googleg/v6/web-24dp/logo_googleg_color_web_24dp.png"
-                        });
-                    }
-                } else if (callData.status === "ended") {
-                    stopRingtoneAndClose();
-                }
+    function listenForGlobalNotice() {
+        db.collection("settings").doc("announcement").onSnapshot(doc => {
+            if (doc.exists && doc.data().active) {
+                document.getElementById('noticeText').innerText = "📢 " + doc.data().text;
+                document.getElementById('noticeBoard').classList.remove('hidden');
+            } else {
+                document.getElementById('noticeBoard').classList.add('hidden');
             }
         });
     }
 
-    function answerCall() {
-        ringtone.pause();
-        alert("কল রিসিভ হয়েছে! (ভিডিও/অডিও স্ট্রিম এখানে যুক্ত হবে)");
-        db.collection("calls").doc(currentUserEmail).delete();
-        document.getElementById("incomingCallScreen").classList.add("hidden");
+    function closeNotice() { document.getElementById('noticeBoard').classList.add('hidden'); }
+    function openAdminPanel() { document.getElementById('adminPanel').classList.remove('hidden'); loadAdminUserTable(); }
+    function closeAdminPanel() { document.getElementById('adminPanel').classList.add('hidden'); }
+
+    async function postNotice() {
+        const text = document.getElementById('newNoticeInput').value.trim();
+        if(!text) {
+            await db.collection("settings").doc("announcement").set({ active: false, text: "" });
+            alert("নোটিশ বন্ধ করা হয়েছে।");
+        } else {
+            await db.collection("settings").doc("announcement").set({ active: true, text: text, timestamp: Date.now() });
+            alert("নোটিশ জারি করা হয়েছে! 📢");
+        }
+        document.getElementById('newNoticeInput').value = "";
     }
 
-    async function declineCall() {
-        stopRingtoneAndClose();
-        await db.collection("calls").doc(currentUserEmail).set({ status: "ended" }, { merge: true });
-        setTimeout(() => { db.collection("calls").doc(currentUserEmail).delete(); }, 2000);
+    function loadAdminUserTable() {
+        db.collection("users").onSnapshot(snapshot => {
+            const tbody = document.getElementById('adminUserTableBody');
+            tbody.innerHTML = '';
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${data.username}</b><br><span style="font-size:0.75rem;color:#777;">${data.email}</span></td>
+                    <td>${data.device || "N/A"}</td>
+                    <td>${data.location || "N/A"}</td>
+                    <td><button style="padding:5px 10px; background:red; color:white; border:none; border-radius:5px; cursor:pointer;" onclick="deleteUserByAdmin('${doc.id}')">Delete</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
     }
 
-    function stopRingtoneAndClose() {
-        ringtone.pause();
-        ringtone.currentTime = 0;
-        document.getElementById("incomingCallScreen").classList.add("hidden");
+    async function deleteUserByAdmin(emailId) {
+        if(confirm(`আপনি কি নিশ্চিতভাবে এই ইউজার ডিলিট করতে চান?`)) {
+            await db.collection("users").doc(emailId).delete();
+            alert("ইউজার ডিলিট করা হয়েছে।");
+        }
     }
 
-    // ফ্রেন্ড লিস্ট লোড এবং কল বাটন যুক্ত করা
     function loadFriends() {
         db.collection("users").onSnapshot(snapshot => {
-            const list = document.getElementById('friendList'); list.innerHTML = '';
+            const list = document.getElementById('friendList');
+            list.innerHTML = '';
             snapshot.forEach(doc => {
-                const data = doc.data(); if (data.email === currentUserEmail) return;
+                const data = doc.data();
+                if (data.email === currentUserEmail) return;
+                const isOnline = data.isOnline && (Date.now() - data.lastActive < 180000);
                 
-                const li = document.createElement('li'); li.classList.add('friend-item');
+                const li = document.createElement('li');
+                li.classList.add('friend-item');
+                if (activeChatFriend === data.email) li.classList.add('active');
+                
+                let avatarContent = data.avatar ? `<img src="${data.avatar}" class="user-avatar">` : `<div class="user-avatar">${data.username.charAt(0).toUpperCase()}</div>`;
                 li.innerHTML = `
-                    <span>🌸 ${data.username}</span>
-                    <button class="call-icon-btn" onclick="event.stopPropagation(); startCall('${data.email}', '${data.username}')">📞 কল</button>
+                    <div class="avatar-container">${avatarContent}<div class="status-dot ${isOnline?'online':''}"></div></div>
+                    <div class="friend-info"><span>🌸 ${data.username}</span></div>
                 `;
                 li.onclick = () => {
                     activeChatFriend = data.email;
@@ -261,37 +380,65 @@
     function loadMessages() {
         if (unsubscribeChat) unsubscribeChat();
         const chatId = [currentUserEmail, activeChatFriend].sort().join('_');
-        unsubscribeChat = db.collection("chats").doc(chatId).collection("messages").orderBy("timestamp", "asc").onSnapshot(snapshot => {
-            const area = document.getElementById('messageArea'); area.innerHTML = '';
-            snapshot.forEach(doc => {
-                const data = doc.data(); const isOwn = data.sender === currentUserEmail;
-                const container = document.createElement('div'); container.classList.add('message-container');
-                container.style.justifyContent = isOwn ? 'flex-end' : 'flex-start';
-                const msgDiv = document.createElement('div'); msgDiv.classList.add('message', isOwn?'outgoing':'incoming');
-                msgDiv.innerText = data.text;
-                container.appendChild(msgDiv); area.appendChild(container);
+        unsubscribeChat = db.collection("chats").doc(chatId).collection("messages").orderBy("timestamp", "asc")
+            .onSnapshot(snapshot => {
+                const area = document.getElementById('messageArea'); area.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data(); const msgId = doc.id; const isOwn = data.sender === currentUserEmail;
+                    const container = document.createElement('div'); container.classList.add('message-container');
+                    container.style.justifyContent = isOwn ? 'flex-end' : 'flex-start';
+                    
+                    const msgDiv = document.createElement('div'); msgDiv.classList.add('message', isOwn?'outgoing':'incoming');
+                    let replyHTML = data.replyTo ? `<div class="reply-in-msg"><b>↪ ${data.replyTo.senderName}:</b> ${data.replyTo.text}</div>` : '';
+                    msgDiv.innerHTML = `${replyHTML}<div>${data.text}</div>`;
+
+                    const actionsDiv = document.createElement('div'); actionsDiv.classList.add('msg-actions');
+                    let deleteBtn = isOwn ? `<button class="action-btn" onclick="deleteMessage('${msgId}')">🗑️</button>` : '';
+                    let editBtn = isOwn ? `<button class="action-btn" onclick="startEditMessage('${msgId}', '${data.text}')">✏️</button>` : '';
+                    let replyBtn = `<button class="action-btn" onclick="startReplyMessage('${data.sender}', '${currentUser}', '${data.text}')">↪️</button>`;
+                    actionsDiv.innerHTML = replyBtn + editBtn + deleteBtn;
+
+                    if(isOwn) { container.appendChild(actionsDiv); container.appendChild(msgDiv); }
+                    else { container.appendChild(msgDiv); container.appendChild(actionsDiv); }
+                    area.appendChild(container);
+                });
+                area.scrollTop = area.scrollHeight;
             });
-            area.scrollTop = area.scrollHeight;
-        });
     }
 
     async function sendMessage() {
         const input = document.getElementById('messageInput'); const text = input.value.trim(); if (!text || !activeChatFriend) return;
         const chatId = [currentUserEmail, activeChatFriend].sort().join('_');
-        await db.collection("chats").doc(chatId).collection("messages").add({ sender: currentUserEmail, text, timestamp: Date.now() });
-        input.value = '';
+        if (editMessageId) {
+            await db.collection("chats").doc(chatId).collection("messages").doc(editMessageId).update({ text });
+            editMessageId = null; document.getElementById('sendBtn').innerText = "পাঠান";
+        } else {
+            const msgData = { sender: currentUserEmail, text, timestamp: Date.now(), replyTo: selectedReplyMsg };
+            await db.collection("chats").doc(chatId).collection("messages").add(msgData);
+        }
+        input.value = ''; cancelReply();
     }
 
-    function listenForGlobalNotice() {
-        db.collection("settings").doc("announcement").onSnapshot(doc => {
-            if (doc.exists && doc.data().active) {
-                document.getElementById('noticeText').innerText = "📢 " + doc.data().text;
-                document.getElementById('noticeBoard').classList.remove('hidden');
-            } else { document.getElementById('noticeBoard').classList.add('hidden'); }
-        });
+    function startReplyMessage(senderEmail, senderName, text) { selectedReplyMsg = { sender: senderEmail, senderName, text }; document.getElementById('replyPreviewText').innerText = `Reply to ${senderName}: ${text}`; document.getElementById('replyPreviewBox').classList.remove('hidden'); }
+    function cancelReply() { selectedReplyMsg = null; document.getElementById('replyPreviewBox').classList.add('hidden'); }
+    function startEditMessage(id, oldText) { editMessageId = id; document.getElementById('messageInput').value = oldText; document.getElementById('sendBtn').innerText = "আপডেট"; }
+    async function deleteMessage(id) { if(confirm("ডিলিট করতে চান?")) { const chatId = [currentUserEmail, activeChatFriend].sort().join('_'); await db.collection("chats").doc(chatId).collection("messages").doc(id).delete(); } }
+    async function addFriend() { alert("সবাই একে অপরের তালিকায় থাকবে!"); }
+    
+    async function handleLogout() {
+        if(currentUserEmail) { await db.collection("users").doc(currentUserEmail).update({ isOnline: false }).catch(()=>{}); }
+        localStorage.clear();
+        auth.signOut();
     }
-    function closeNotice() { document.getElementById('noticeBoard').classList.add('hidden'); }
-    async function handleLogout() { localStorage.clear(); auth.signOut(); location.reload(); }
+
+    function handleLogoutUI() {
+        currentUser = null; currentUserEmail = null;
+        document.getElementById('authScreen').classList.remove('hidden');
+        document.getElementById('appScreen').classList.add('hidden');
+        document.getElementById('adminPanelBtn').classList.add('hidden');
+        document.getElementById('loginBtn').classList.remove('hidden');
+        document.getElementById('loadingSpinner').classList.add('hidden');
+    }
     document.getElementById('messageInput').addEventListener('keypress', e => e.key === 'Enter' && sendMessage());
 </script>
 </body>
