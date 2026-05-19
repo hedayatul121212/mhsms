@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MHSMS - ইউজারনেম সার্চ আপডেট</title>
+    <title>MHSMS - কলিং ও ছোট সার্চ বার আপডেট</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
@@ -35,7 +35,7 @@
         .auth-tab.active { color: #ff4d6d; border-bottom: 3px solid #ff4d6d; }
         
         .form-group { margin-bottom: 15px; text-align: left; }
-        .form-group label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 5px; font-weight: 600; }
+        .form-group label { display: block; font-size: 0.85rem; color: #55px; margin-bottom: 5px; font-weight: 600; }
         .form-group input { width: 100%; padding: 10px 15px; border: 1px solid #ffccd5; border-radius: 25px; outline: none; font-size: 0.95rem; }
         
         .avatar-picker-wrapper { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
@@ -47,15 +47,15 @@
         .sidebar { width: 30%; border-right: 1px solid rgba(255, 183, 178, 0.5); display: flex; flex-direction: column; background: rgba(255, 245, 247, 0.6); padding-top: 40px; }
         .sidebar-header { padding: 15px; background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; font-weight: bold; text-align: center; }
         
-        /* নতুন ইউজারনেম সার্চ বক্স */
-        .search-container { padding: 10px; background: rgba(255, 240, 243, 0.5); border-bottom: 1px solid rgba(255, 229, 236, 0.5); }
-        .search-box { display: flex; gap: 5px; }
-        .search-box input { flex: 1; padding: 8px 12px; border: 1px solid #ffccd5; border-radius: 15px; outline: none; font-size: 0.85rem; }
-        .search-box button { padding: 8px 12px; background: #ff4d6d; color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        /* 🔍 ছোট এবং মার্জিত সার্চ বক্স ডিজাইন */
+        .search-container { padding: 8px 12px; background: rgba(255, 240, 243, 0.4); border-bottom: 1px solid rgba(255, 229, 236, 0.4); }
+        .search-box { display: flex; gap: 4px; max-width: 90%; margin: 0 auto; }
+        .search-box input { flex: 1; padding: 5px 10px; border: 1px solid #ffccd5; border-radius: 12px; outline: none; font-size: 0.8rem; height: 28px; }
+        .search-box button { padding: 0 10px; background: #ff4d6d; color: white; border: none; border-radius: 12px; cursor: pointer; font-size: 0.75rem; font-weight: bold; height: 28px; }
         
-        .search-result { background: #fff0f3; padding: 10px; border-bottom: 2px dashed #ffccd5; font-size: 0.9rem; max-height: 150px; overflow-y: auto; }
-        .search-result-item { display: flex; justify-content: space-between; align-items: center; background: white; padding: 8px; border-radius: 10px; border: 1px solid #ffccd5; margin-top: 5px; }
-        .add-friend-btn { padding: 4px 10px; background: #28a745; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+        .search-result { background: #fff0f3; padding: 8px; border-bottom: 2px dashed #ffccd5; font-size: 0.85rem; max-height: 120px; overflow-y: auto; }
+        .search-result-item { display: flex; justify-content: space-between; align-items: center; background: white; padding: 6px; border-radius: 8px; border: 1px solid #ffccd5; margin-top: 4px; }
+        .add-friend-btn { padding: 3px 8px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
 
         .friend-list { flex: 1; overflow-y: auto; list-style: none; }
         .friend-item { padding: 12px; border-bottom: 1px solid rgba(255, 229, 236, 0.5); cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; transition: 0.2s; }
@@ -70,7 +70,13 @@
 
         /* Chat Area */
         .chat-area { width: 70%; display: flex; flex-direction: column; background: rgba(255, 251, 251, 0.5); padding-top: 40px; }
-        .chat-header { padding: 12px 15px; background: rgba(255, 240, 243, 0.7); border-bottom: 1px solid rgba(255, 229, 236, 0.5); font-weight: bold; color: #ff4d6d; }
+        
+        /* 📞 কলিং ফিচারের জন্য হেডার আপডেট */
+        .chat-header { padding: 10px 15px; background: rgba(255, 240, 243, 0.8); border-bottom: 1px solid rgba(255, 229, 236, 0.5); font-weight: bold; color: #ff4d6d; display: flex; justify-content: space-between; align-items: center; }
+        .call-buttons { display: flex; gap: 12px; }
+        .call-btn { background: none; border: none; font-size: 1.25rem; cursor: pointer; transition: transform 0.2s; padding: 4px; }
+        .call-btn:hover { transform: scale(1.15); }
+
         .message-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
         
         .message-container { display: flex; align-items: center; width: 100%; gap: 8px; touch-action: pan-y; position: relative; transition: transform 0.1s linear; }
@@ -152,7 +158,7 @@
         
         <div class="search-container">
             <div class="search-box">
-                <input type="text" id="searchFriendInput" placeholder="বন্ধুর ইউজারনেম লিখুন...">
+                <input type="text" id="searchFriendInput" placeholder="বন্ধুর নাম...">
                 <button onclick="searchFriend()">খুঁজুন</button>
             </div>
         </div>
@@ -165,7 +171,13 @@
     </div>
     
     <div class="chat-area">
-        <div class="chat-header" id="currentChatUser">কোনো বন্ধু সিলেক্ট করুন</div>
+        <div class="chat-header">
+            <span id="currentChatUser">কোনো বন্ধু সিলেক্ট করুন</span>
+            <div class="call-buttons id="callBtnSection" class="hidden">
+                <button class="call-btn" onclick="makeCall('voice')">📞</button>
+                <button class="call-btn" onclick="makeCall('video')">📹</button>
+            </div>
+        </div>
         <div class="message-area" id="messageArea"></div>
         
         <div id="replyPreviewBox" class="reply-preview hidden">
@@ -249,9 +261,8 @@
         if(password.length < 6) { alert("পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে!"); return; }
 
         try {
-            // ইউজারনেমটি আগে থেকেই কেউ ব্যবহার করছে কিনা তা চেক করা
             const usernameCheck = await db.collection("users").where("username", "==", username).get();
-            if(!usernameCheck.empty) { alert("এই ইউজারনেমটি ইতিমধ্যে ব্যবহৃত হয়েছে! অন্য একটি নাম চেষ্টা করুন।"); return; }
+            if(!usernameCheck.empty) { alert("এই ইউজারনেমটি ইতিমধ্যে ব্যবহৃত হয়েছে!"); return; }
 
             await auth.createUserWithEmailAndPassword(email, password);
             localStorage.setItem("mhsms_logged_email", email);
@@ -298,7 +309,6 @@
         loadFriends();
     }
 
-    // 🔍 ইউজারনেম দিয়ে বন্ধুদের খোঁজার মূল ফাংশন
     async function searchFriend() {
         const searchInput = document.getElementById('searchFriendInput').value.trim();
         const resultArea = document.getElementById('searchResultArea');
@@ -307,30 +317,27 @@
         if(searchInput === currentUser) { alert("আপনি নিজের নাম সার্চ করতে পারবেন না!"); return; }
 
         resultArea.classList.remove('hidden');
-        resultArea.innerHTML = `<p style="font-size:0.8rem;color:#666;">খোঁজা হচ্ছে...</p>`;
+        resultArea.innerHTML = `<p style="font-size:0.75rem;color:#666;">খোঁজা হচ্ছে...</p>`;
 
         try {
-            // ডাটাবেসে ইউজারনেম ফিল্ড ম্যাচ করানো
             const snapshot = await db.collection("users").where("username", "==", searchInput).get();
-            
             if(!snapshot.empty) {
-                resultArea.innerHTML = `<p style="font-size:0.8rem; font-weight:bold; color:#ff4d6d;">ইউজার পাওয়া গেছে:</p>`;
+                resultArea.innerHTML = '';
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    // যদি ইতিমধ্যে নিজের লিস্টে অ্যাড না থাকে তবেই দেখাবে
                     const div = document.createElement('div');
                     div.classList.add('search-result-item');
                     div.innerHTML = `
                         <span>🌸 <b>${data.username}</b></span>
-                        <button class="add-friend-btn" onclick="addFriendToList('${data.email}')">অ্যাড করুন</button>
+                        <button class="add-friend-btn" onclick="addFriendToList('${data.email}')">অ্যাড</button>
                     `;
                     resultArea.appendChild(div);
                 });
             } else {
-                resultArea.innerHTML = `<p style="font-size:0.8rem;color:red;">এই ইউজারনেম দিয়ে কোনো অ্যাকাউন্ট খোলা নেই!</p>`;
+                resultArea.innerHTML = `<p style="font-size:0.75rem;color:red;">ইউজার পাওয়া যায়নি!</p>`;
             }
         } catch (error) {
-            resultArea.innerHTML = `<p style="font-size:0.8rem;color:red;">ত্রুটি ঘটেছে!</p>`;
+            resultArea.innerHTML = `<p style="font-size:0.75rem;color:red;">ত্রুটি ঘটেছে!</p>`;
         }
     }
 
@@ -361,22 +368,18 @@
     function loadFriends() {
         db.collection("users").doc(currentUserEmail).collection("myFriends").onSnapshot(snapshot => {
             const list = document.getElementById('friendList'); list.innerHTML = '';
-            
             if(snapshot.empty) {
-                list.innerHTML = `<p style="text-align:center; font-size:0.85rem; color:#888; padding:20px;">উপরে ইউজারনেম সার্চ করে বন্ধু অ্যাড করুন! 🌸</p>`;
+                list.innerHTML = `<p style="text-align:center; font-size:0.8rem; color:#888; padding:20px;">উপরে নাম সার্চ করে বন্ধু অ্যাড করুন! 🌸</p>`;
                 return;
             }
-
             snapshot.forEach(async (friendDoc) => {
                 const friendEmail = friendDoc.id;
                 const userDoc = await db.collection("users").doc(friendEmail).get();
-                
                 if(userDoc.exists) {
                     const data = userDoc.data();
                     const isOnline = data.isOnline && (Date.now() - data.lastActive < 180000);
                     const li = document.createElement('li'); li.classList.add('friend-item');
                     if (activeChatFriend === data.email) li.classList.add('active');
-                    
                     let avatarContent = data.avatar ? `<img src="${data.avatar}" class="user-avatar">` : `<div class="user-avatar">${data.username.charAt(0).toUpperCase()}</div>`;
                     
                     li.innerHTML = `
@@ -398,6 +401,12 @@
         loadMessages();
         const items = document.querySelectorAll('.friend-item');
         items.forEach(item => item.classList.remove('active'));
+    }
+
+    // 📞 কলিং নোটিফিকেশন ফাংশন
+    function makeCall(type) {
+        if(!activeChatFriend) return;
+        alert(`${type === 'voice' ? '📞 ভয়েস কল' : '📹 ভিডিও কল'} ফিচারটি শীঘ্রই যুক্ত করা হচ্ছে! বর্তমানে রিয়েল-টাইম কানেক্টিভিটি চেক করা হচ্ছে।`);
     }
 
     function loadMessages() {
@@ -422,7 +431,7 @@
 
                 const actionsDiv = document.createElement('div'); actionsDiv.classList.add('msg-actions');
                 let deleteBtn = isOwn ? `<button class="action-btn" onclick="deleteMessage('${msgId}')">🗑️</button>` : '';
-                let editBtn = (isOwn && !data.type) ? `<button class="action-btn" onclick="startEditMessage('${msgId}', '${data.text}')">✏️</button>` : '';
+                let editBtn = (isOwn && !data.type) ? `<button class="action-btn" onclick="startEditMessage('${msgId}', '${data.text}')">✏></button>` : '';
                 actionsDiv.innerHTML = editBtn + deleteBtn;
 
                 if(isOwn) { container.appendChild(actionsDiv); container.appendChild(msgDiv); }
@@ -480,7 +489,6 @@
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaRecorder = new MediaRecorder(stream);
             audioChunks = [];
-            
             mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
             mediaRecorder.onstop = async () => {
                 const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
@@ -494,7 +502,6 @@
                 };
                 reader.readAsDataURL(audioBlob);
             };
-            
             mediaRecorder.start();
             btn.classList.add('rec-active');
         } else {
