@@ -21,8 +21,6 @@
         .auth-container input:focus { border-color: #2481cc; }
         .auth-container button { width: 100%; padding: 14px; background: #2481cc; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
         .auth-toggle-link { color: #2481cc; font-size: 0.9rem; margin-top: 15px; cursor: pointer; text-decoration: none; }
-        
-        /* Profile Pic Upload Label */
         .file-input-label { display: block; width: 100%; padding: 12px; background: #24303f; border: 1px dashed #2481cc; border-radius: 10px; color: #2481cc; cursor: pointer; margin: 8px 0; font-size: 0.95rem; }
 
         /* 🔝 Header */
@@ -37,14 +35,13 @@
         .friend-list { flex: 1; overflow-y: auto; list-style: none; background: #17212b; }
         .friend-item { padding: 12px 16px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #101921; }
         .friend-item:hover { background: #202b36; }
-        
         .avatar { width: 48px; height: 48px; border-radius: 50%; background: #2481cc; color: white; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 1.15rem; text-transform: uppercase; background-size: cover; background-position: center; }
         
         .chat-info { flex: 1; display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
         .chat-name { font-weight: 500; color: #fff; font-size: 1rem; }
         .chat-preview { font-size: 0.9rem; color: #7f91a4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* 💬 Chat Window & Swipe Mechanism */
+        /* 💬 Chat Window */
         .chat-window { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0e1621; display: flex; flex-direction: column; z-index: 100; transform: translateX(100%); transition: transform 0.22s ease-in-out; }
         .chat-window.open { transform: translateX(0); }
         .chat-win-header { background: #17212b; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #111a22; }
@@ -53,7 +50,6 @@
 
         .message-area { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-color: #0e1621; }
         .message-wrapper { display: flex; flex-direction: column; width: 100%; position: relative; overflow: hidden; }
-        
         .message { padding: 10px 14px; border-radius: 12px; max-width: 75%; word-wrap: break-word; font-size: 0.95rem; position: relative; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.1s linear; user-select: none; }
         .message.incoming { background: #182533; align-self: flex-start; color: #fff; border-bottom-left-radius: 3px; }
         .message.outgoing { background: #2b5278; align-self: flex-end; color: #fff; border-bottom-right-radius: 3px; }
@@ -180,9 +176,38 @@
     let authMode = "login";
     let selectedReplyMsgId = null;
     let selectedReplyText = "";
-    let base64AvatarString = ""; // প্রোফাইল পিক ডাটা সেভ রাখার জন্য
+    let base64AvatarString = "";
 
-    window.onload = function() { if(currentUser) loginSuccess(currentUser); };
+    window.onload = function() { 
+        listenForAppUpdates(); // রিমোট আপডেট লিসেনার চালু করা
+        if(currentUser) loginSuccess(currentUser); 
+    };
+
+    // 🚀 অ্যাডমিন অ্যাপ থেকে লাইভ আপডেট ট্র্যাক করার ফাংশন
+    function listenForAppUpdates() {
+        db.collection("settings").doc("admin_controls").onSnapshot(doc => {
+            if(doc.exists) {
+                const data = doc.data();
+                
+                // নোটিশ কন্ট্রোল
+                const noticeBar = document.getElementById("adminNotice");
+                if(data.noticeText && data.noticeText.trim() !== "") {
+                    noticeBar.innerText = "📢 " + data.noticeText;
+                    noticeBar.classList.remove("hidden");
+                } else { noticeBar.classList.add("hidden"); }
+
+                // অ্যাপ ডিরেক্ট এলার্ট/আপডেট মেসেজ পুশ
+                if(data.appUpdateAlert && data.appUpdateAlert.trim() !== "") {
+                    // লোকালস্টোরেজ দিয়ে চেক করা হচ্ছে যাতে একবার এলার্ট দেখলে বারবার পপ-আপ না হয়
+                    const lastAlert = localStorage.getItem("last_app_alert");
+                    if (lastAlert !== data.appUpdateAlert) {
+                        alert("🚀 MHSMS নতুন আপডেট বার্তা:\n\n" + data.appUpdateAlert);
+                        localStorage.setItem("last_app_alert", data.appUpdateAlert);
+                    }
+                }
+            }
+        });
+    }
 
     function switchAuthMode(mode) {
         authMode = mode;
@@ -203,7 +228,6 @@
         }
     }
 
-    // ফাইল রিডার ফাংশন (ছবি বা অডিওকে লোকাল টেক্সট ডাটায় রূপান্তর করার জন্য)
     function handleProfilePicSelect(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
@@ -216,26 +240,18 @@
         }
     }
 
-    // চ্যাটে সরাসরি ফোন থেকে ছবি সিলেক্ট করার পর যা হবে
     function handleChatImageSelect(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                sendMessage("image", e.target.result);
-                input.value = ""; // রিসেট
-            };
+            reader.onload = function(e) { sendMessage("image", e.target.result); input.value = ""; };
             reader.readAsDataURL(input.files[0]);
         }
     }
 
-    // চ্যাটে সরাসরি ফোন থেকে অডিও ফাইল সিলেক্ট করার পর যা হবে
     function handleChatAudioSelect(input) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                sendMessage("audio", e.target.result);
-                input.value = ""; // রিসেট
-            };
+            reader.onload = function(e) { sendMessage("audio", e.target.result); input.value = ""; };
             reader.readAsDataURL(input.files[0]);
         }
     }
@@ -313,24 +329,15 @@
                 const msgDiv = document.createElement('div'); msgDiv.classList.add('message', data.sender === currentUser ? 'outgoing' : 'incoming');
                 msgDiv.setAttribute('data-id', msgId);
 
-                if(data.replyToText) {
-                    msgDiv.innerHTML += `<div class="reply-box-in-msg">💬 ${data.replyToText}</div>`;
-                }
+                if(data.replyToText) msgDiv.innerHTML += `<div class="reply-box-in-msg">💬 ${data.replyToText}</div>`;
 
-                if(data.type === "image") {
-                    msgDiv.innerHTML += `<img class="msg-media" src="${data.text}">`;
-                } else if(data.type === "audio") {
-                    msgDiv.innerHTML += `<audio controls class="msg-audio" src="${data.text}"></audio>`;
-                } else {
-                    msgDiv.innerHTML += `<div>${data.text}</div>`;
-                }
+                if(data.type === "image") msgDiv.innerHTML += `<img class="msg-media" src="${data.text}">`;
+                else if(data.type === "audio") msgDiv.innerHTML += `<audio controls class="msg-audio" src="${data.text}"></audio>`;
+                else msgDiv.innerHTML += `<div>${data.text}</div>`;
 
-                if(data.sender === currentUser) {
-                    msgDiv.onclick = () => handleMessageOptions(msgId, data.text, data.type);
-                }
+                if(data.sender === currentUser) msgDiv.onclick = () => handleMessageOptions(msgId, data.text, data.type);
 
                 setupSwipeToReply(msgDiv, data.type === 'text' ? data.text : `[${data.type} file]`);
-
                 wrapper.appendChild(msgDiv); area.appendChild(wrapper);
             });
             area.scrollTop = area.scrollHeight;
