@@ -3,33 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram - MHSMS</title>
+    <title>MHSMS</title>
     <style>
-        /* 🎨 Telegram Dark Mode Global Setup */
+        /* 🎨 Dark Mode Global Setup */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         body { background-color: #17212b; color: #f5f5f5; display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; overflow: hidden; }
         
         .admin-notice-bar { width: 100%; max-width: 450px; background: #2b5278; color: #fff; padding: 10px; text-align: center; font-weight: bold; font-size: 0.9rem; border-bottom: 1px solid #101921; z-index: 10; }
         .app-container { width: 100%; max-width: 450px; height: 100vh; background: #17212b; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         
-        /* 🔐 Auth Screen */
-        .auth-container { width: 100%; max-width: 450px; height: 100vh; background: #17212b; padding: 40px 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .auth-container .tg-logo { font-size: 4rem; margin-bottom: 20px; color: #2481cc; }
-        .auth-container h2 { margin-bottom: 10px; color: #fff; font-size: 1.6rem; font-weight: 500; }
-        .auth-container p { color: #7f91a4; font-size: 0.9rem; margin-bottom: 30px; }
-        .auth-container input { width: 100%; padding: 14px; margin: 10px 0; background: #24303f; border: 1px solid #2f3e4e; border-radius: 10px; outline: none; color: white; font-size: 1rem; }
+        /* 🔐 Auth Screen Setup */
+        .auth-container { width: 100%; max-width: 450px; height: 100vh; background: #17212b; padding: 30px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; overflow-y: auto; }
+        .auth-container .app-logo { font-size: 4rem; margin-bottom: 15px; color: #2481cc; }
+        .auth-container h2 { margin-bottom: 8px; color: #fff; font-size: 1.6rem; font-weight: 500; }
+        .auth-container p { color: #7f91a4; font-size: 0.9rem; margin-bottom: 20px; }
+        .auth-container input { width: 100%; padding: 14px; margin: 8px 0; background: #24303f; border: 1px solid #2f3e4e; border-radius: 10px; outline: none; color: white; font-size: 1rem; }
         .auth-container input:focus { border-color: #2481cc; }
-        .auth-container button { width: 100%; padding: 14px; background: #2481cc; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; }
+        .auth-container button { width: 100%; padding: 14px; background: #2481cc; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
         
-        /* 🔝 Telegram Home Header */
+        .auth-toggle-link { color: #2481cc; font-size: 0.9rem; margin-top: 15px; cursor: pointer; text-decoration: none; }
+        .auth-toggle-link:hover { text-decoration: underline; }
+
+        /* 🔝 Home Header */
         .tg-header { background: #233140; padding: 15px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #101921; }
         .tg-header-left { display: flex; align-items: center; gap: 15px; }
-        .tg-menu-icon { font-size: 1.4rem; cursor: pointer; color: #6c7883; }
         .tg-title { font-size: 1.25rem; font-weight: 500; color: #fff; }
+        .logout-btn { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
+        
         .tg-search-bar { background: #17212b; margin: 8px 12px; padding: 10px 15px; border-radius: 10px; display: flex; align-items: center; }
         .tg-search-bar input { background: none; border: none; outline: none; color: white; width: 100%; font-size: 0.95rem; }
 
-        /* 👥 Chat List Main Frame */
+        /* 👥 Chat List */
         .friend-list { flex: 1; overflow-y: auto; list-style: none; background: #17212b; }
         .friend-item { padding: 12px 16px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #101921; }
         .friend-item:hover { background: #202b36; }
@@ -44,7 +48,7 @@
         .chat-preview { font-size: 0.9rem; color: #7f91a4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .group-chat-item { background: #1c2733; }
 
-        /* 💬 Telegram Style Chat Window */
+        /* 💬 Chat Window */
         .chat-window { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #0e1621; display: flex; flex-direction: column; z-index: 100; transform: translateX(100%); transition: transform 0.22s ease-in-out; }
         .chat-window.open { transform: translateX(0); }
         
@@ -101,20 +105,27 @@
 <div id="adminNotice" class="admin-notice-bar hidden">📢 নোটিশ...</div>
 
 <div id="authScreen" class="auth-container">
-    <div class="tg-logo">✈️</div>
-    <h2>Telegram - MHSMS</h2>
-    <p>ইউজারনেম দিয়ে সাইন-ইন করুন</p>
-    <input type="text" id="usernameInput" placeholder="ইউজারনেম">
-    <input type="password" id="passwordInput" placeholder="পাসওয়ার্ড">
-    <button id="authBtn" onclick="handleAuth()">লগইন / রেজিস্টার</button>
+    <div class="app-logo">🚀</div>
+    <h2 id="authTitle">MHSMS - লগইন</h2>
+    <p id="authDesc">আপনার একাউন্টে প্রবেশ করুন</p>
+    
+    <input type="text" id="authUsername" placeholder="ইউজারনেম">
+    <input type="email" id="authEmail" class="hidden" placeholder="জিমেইল এড্রেস (Gmail)">
+    <input type="password" id="authPassword" placeholder="পাসওয়ার্ড">
+    <input type="password" id="authConfirmPassword" class="hidden" placeholder="নতুন পাসওয়ার্ডটি আবার দিন">
+    
+    <button id="authSubmitBtn" onclick="handleAuthSubmit()">লগইন করুন</button>
+    
+    <div class="auth-toggle-link" id="toggleLink1" onclick="switchAuthMode('signup')">নতুন একাউন্ট খুলুন (Sign Up)</div>
+    <div class="auth-toggle-link" id="toggleLink2" onclick="switchAuthMode('forgot')">পাসওয়ার্ড ভুলে গেছেন? (Forgot Password)</div>
 </div>
 
 <div id="appScreen" class="app-container hidden">
     <div class="tg-header">
         <div class="tg-header-left">
-            <div class="tg-menu-icon">☰</div>
-            <div class="tg-title">Telegram</div>
+            <div class="tg-title">MHSMS</div>
         </div>
+        <button class="logout-btn" onclick="handleLogout()">লগআউট</button>
     </div>
 
     <div class="add-friend-bar">
@@ -198,13 +209,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    let currentUser = null;
+    let currentUser = localStorage.getItem("mhsms_user") || null;
     let activeChatFriend = null;
     let isGroupChatActive = false;
     let unsubscribeChat = null;
     let unsubscribeCalls = null;
     let isInitialLoad = true;
     let lastRenderedDate = null;
+    let authMode = "login"; // login, signup, forgot
     
     let localStream = null;
     let remoteStream = null;
@@ -213,14 +225,141 @@
 
     const rtcConfig = { iceServers: [{ urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'] }] };
 
+    window.onload = function() {
+        if(currentUser) {
+            loginSuccess(currentUser);
+        }
+    };
+
+    function switchAuthMode(mode) {
+        authMode = mode;
+        const title = document.getElementById("authTitle");
+        const desc = document.getElementById("authDesc");
+        const emailField = document.getElementById("authEmail");
+        const passwordField = document.getElementById("authPassword");
+        const confirmPasswordField = document.getElementById("authConfirmPassword");
+        const submitBtn = document.getElementById("authSubmitBtn");
+        const link1 = document.getElementById("toggleLink1");
+        const link2 = document.getElementById("toggleLink2");
+
+        // ক্লিয়ার ফিল্ডস
+        document.getElementById("authUsername").value = "";
+        emailField.value = "";
+        passwordField.value = "";
+        confirmPasswordField.value = "";
+
+        if(mode === "login") {
+            title.innerText = "MHSMS - লগইন";
+            desc.innerText = "আপনার একাউন্টে প্রবেশ করুন";
+            emailField.classList.add("hidden");
+            passwordField.classList.remove("hidden");
+            passwordField.placeholder = "পাসওয়ার্ড";
+            confirmPasswordField.classList.add("hidden");
+            submitBtn.innerText = "লগইন করুন";
+            link1.innerText = "নতুন একাউন্ট খুলুন (Sign Up)";
+            link1.setAttribute("onclick", "switchAuthMode('signup')");
+            link2.classList.remove("hidden");
+        } else if(mode === "signup") {
+            title.innerText = "MHSMS - রেজিস্ট্রেশন";
+            desc.innerText = "নতুন একাউন্ট তৈরি করতে ফর্মটি পূরণ করুন";
+            emailField.classList.remove("hidden");
+            passwordField.classList.remove("hidden");
+            passwordField.placeholder = "পাসওয়ার্ড";
+            confirmPasswordField.classList.add("hidden");
+            submitBtn.innerText = "একাউন্ট তৈরি করুন";
+            link1.innerText = "আগের একাউন্ট আছে? লগইন করুন";
+            link1.setAttribute("onclick", "switchAuthMode('login')");
+            link2.classList.add("hidden");
+        } else if(mode === "forgot") {
+            title.innerText = "পাসওয়ার্ড রিসেট";
+            desc.innerText = "ইউজারনেম ও জিমেইল দিয়ে নতুন পাসওয়ার্ড সেট করুন";
+            emailField.classList.remove("hidden");
+            passwordField.classList.remove("hidden");
+            passwordField.placeholder = "নতুন পাসওয়ার্ড";
+            confirmPasswordField.classList.remove("hidden");
+            submitBtn.innerText = "পাসওয়ার্ড পরিবর্তন করুন";
+            link1.innerText = "লগইন স্ক্রিনে ফিরে যান";
+            link1.setAttribute("onclick", "switchAuthMode('login')");
+            link2.classList.add("hidden");
+        }
+    }
+
+    async function handleAuthSubmit() {
+        const username = document.getElementById('authUsername').value.trim().toLowerCase();
+        const email = document.getElementById('authEmail').value.trim().toLowerCase();
+        const password = document.getElementById('authPassword').value.trim();
+        const confirmPassword = document.getElementById('authConfirmPassword').value.trim();
+
+        if(!username) { alert("ইউজারনেম দিন।"); return; }
+
+        if(authMode === "login") {
+            if(!password) { alert("পাসওয়ার্ড দিন।"); return; }
+            try {
+                const doc = await db.collection("users").doc(username).get();
+                if (doc.exists && doc.data().password === password) {
+                    loginSuccess(username);
+                } else { alert("ভুল ইউজারনেম অথবা পাসওয়ার্ড!"); }
+            } catch (e) { alert("লগইন এরর: " + e.message); }
+        } 
+        else if(authMode === "signup") {
+            if(!email || !password) { alert("সবগুলো ঘর পূরণ করুন।"); return; }
+            if(password.length < 6) { alert("পাসওয়ার্ড অন্তত ৬ অক্ষরের হতে হবে।"); return; }
+            try {
+                const userRef = db.collection("users").doc(username);
+                const doc = await userRef.get();
+                if(doc.exists) { alert("এই ইউজারনেমটি ইতিমধ্যে ব্যবহার করা হয়েছে। অন্য একটি দিন।"); return; }
+                
+                await userRef.set({ username, email, password, friends: [] });
+                alert("একাউন্ট তৈরি সফল হয়েছে!");
+                loginSuccess(username);
+            } catch (e) { alert("রেজিস্ট্রেশন এরর: " + e.message); }
+        } 
+        else if(authMode === "forgot") {
+            if(!email || !password || !confirmPassword) { alert("সবগুলো ঘর পূরণ করুন।"); return; }
+            if(password !== confirmPassword) { alert("পাসওয়ার্ড দুটি মেলেনি।"); return; }
+            if(password.length < 6) { alert("নতুন পাসওয়ার্ড অন্তত ৬ অক্ষরের দিন।"); return; }
+            try {
+                const userRef = db.collection("users").doc(username);
+                const doc = await userRef.get();
+                if(doc.exists && doc.data().email === email) {
+                    await userRef.update({ password: password });
+                    alert("পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে! নতুন পাসওয়ার্ড দিয়ে লগইন করুন।");
+                    switchAuthMode('login');
+                } else {
+                    alert("ইউজারনেম বা জিমেইল এড্রেসটি মেলেনি। সঠিক তথ্য দিন।");
+                }
+            } catch(e) { alert("রিসেট এরর: " + e.message); }
+        }
+    }
+
+    function loginSuccess(username) {
+        currentUser = username;
+        localStorage.setItem("mhsms_user", username);
+        document.getElementById('authScreen').classList.add('hidden');
+        document.getElementById('appScreen').classList.remove('hidden');
+        listenForAdminUpdates();
+        loadFriends();
+        listenForIncomingCalls();
+        listenForAllIncomingMessages();
+    }
+
+    function handleLogout() {
+        if(confirm("আপনি কি নিশ্চিতভাবে লগআউট করতে চান?")) {
+            localStorage.removeItem("mhsms_user");
+            currentUser = null;
+            if (unsubscribeChat) unsubscribeChat();
+            if (unsubscribeCalls) unsubscribeCalls();
+            
+            document.getElementById('appScreen').classList.add('hidden');
+            document.getElementById('authScreen').classList.remove('hidden');
+            switchAuthMode('login');
+        }
+    }
+
     function toggleInputIcon() {
         const input = document.getElementById('messageInput');
         const btn = document.getElementById('micSendBtn');
-        if(input.value.trim().length > 0) {
-            btn.innerText = "🚀";
-        } else {
-            btn.innerText = "🎙️";
-        }
+        btn.innerText = input.value.trim().length > 0 ? "🚀" : "🎙️";
     }
 
     function listenForAdminUpdates() {
@@ -240,31 +379,6 @@
         });
     }
 
-    async function handleAuth() {
-        const username = document.getElementById('usernameInput').value.trim().toLowerCase();
-        const password = document.getElementById('passwordInput').value.trim();
-        if(!username || password.length < 6) { alert("সঠিক ইউজারনেম ও পাসওয়ার্ড দিন।"); return; }
-        try {
-            const userRef = db.collection("users").doc(username);
-            const doc = await userRef.get();
-            if (doc.exists && doc.data().password === password) { loginSuccess(username); } 
-            else if (!doc.exists) {
-                await userRef.set({ username, password, friends: [] });
-                loginSuccess(username);
-            } else { alert("ভুল পাসওয়ার্ড!"); }
-        } catch (e) { alert("এরর: " + e.message); }
-    }
-
-    function loginSuccess(username) {
-        currentUser = username;
-        document.getElementById('authScreen').classList.add('hidden');
-        document.getElementById('appScreen').classList.remove('hidden');
-        listenForAdminUpdates();
-        loadFriends();
-        listenForIncomingCalls();
-        listenForAllIncomingMessages();
-    }
-
     function listenForAllIncomingMessages() {
         db.collectionGroup("messages").orderBy("timestamp", "desc").limit(1).onSnapshot(snapshot => {
             if (isInitialLoad) { isInitialLoad = false; return; }
@@ -275,16 +389,15 @@
                         const ring = document.getElementById('smsRingtone');
                         if (ring) {
                             ring.currentTime = 0;
-                            ring.play().catch(e => console.log("User interaction required for audio:", e));
+                            ring.play().catch(e => console.log("Audio blocked:", e));
                         }
-                        
                         if ("Notification" in window && Notification.permission === "granted" && document.hidden) {
-                            new Notification(`Telegram: ${data.sender}`, { body: data.text });
+                            new Notification(`MHSMS: ${data.sender}`, { body: data.text });
                         }
                     }
                 }
             });
-        }, e => console.log("Listening to updates..."));
+        });
     }
 
     function loadFriends() {
@@ -297,8 +410,8 @@
                 li.innerHTML = `
                     <div class="avatar">${letter}</div>
                     <div class="chat-info">
-                        <div class="chat-info-top"><span class="chat-name">${friend}</span><span class="chat-time">Tue</span></div>
-                        <span class="chat-preview">Tap to view chat conversation</span>
+                        <div class="chat-info-top"><span class="chat-name">${friend}</span><span class="chat-time">Active</span></div>
+                        <span class="chat-preview">চ্যাট করতে এখানে আলতো চাপুন</span>
                     </div>
                 `;
                 li.onclick = () => { 
@@ -344,7 +457,6 @@
             const area = document.getElementById('messageArea'); area.innerHTML = '';
             snapshot.forEach(doc => {
                 const data = doc.data();
-                
                 const msgDateString = new Date(data.timestamp).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
                 if(msgDateString !== lastRenderedDate) {
                     const dateBadge = document.createElement('div');
@@ -379,7 +491,6 @@
         toggleInputIcon();
     }
 
-    // 📞 Call Management (ইনকামিং কলের জন্য আপনার দেওয়া Tujh Bin রিংটোন সেটআপ)
     async function makeCall(type) {
         if(!activeChatFriend) return;
         currentCallId = currentUser + "_" + Date.now();
@@ -411,19 +522,18 @@
         listenToCallStatus();
     }
 
-    // 🔔 ওপার থেকে কল আসলে আপনার মিউজিকটি এখানে বাজবে
     function listenForIncomingCalls() {
-        db.collection("calls").where("receiver", "==", currentUser).where("status", "==", "ringing").onSnapshot(snap => {
+        if (unsubscribeCalls) unsubscribeCalls();
+        unsubscribeCalls = db.collection("calls").where("receiver", "==", currentUser).where("status", "==", "ringing").onSnapshot(snap => {
             snap.forEach(doc => {
                 if (currentCallId) return; 
                 const d = doc.data(); currentCallId = doc.id;
                 showCallOverlay(d.caller, `Incoming ${d.type} Call...`, true);
                 
-                // 🎵 আপনার আপলোড করা Tujh Bin ইনস্ট্রুমেন্টাল রিংটোন বাজবে লুপ আকারে
                 const callMusic = document.getElementById('ringtoneSound');
                 if (callMusic) {
                     callMusic.currentTime = 0;
-                    callMusic.play().catch(e => console.log("Audio play blocked until user tap:", e));
+                    callMusic.play().catch(e => console.log("Audio play blocked:", e));
                 }
             });
         });
@@ -457,8 +567,7 @@
     }
 
     function listenToCallStatus() {
-        if (unsubscribeCalls) unsubscribeCalls();
-        unsubscribeCalls = db.collection("calls").doc(currentCallId).onSnapshot(doc => {
+        db.collection("calls").doc(currentCallId).onSnapshot(doc => {
             if(!doc.exists) { cleanUpCallUI(); return; }
             if(doc.data().status === "accepted") { document.getElementById('ringingSound').pause(); document.getElementById('ringtoneSound').pause(); document.getElementById('callTypeStatus').innerText = "Connected 🎙️"; }
             else if(doc.data().status === "ended") cleanUpCallUI();
